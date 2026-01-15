@@ -36,6 +36,8 @@ import {
 import { useSidebar } from "@/components/ui/sidebar"
 import { Info } from "lucide-react"
 
+import logoIcon from "@/assets/logo-icon.png"
+
 export function AppSidebar() {
     const { pathname } = useLocation()
     const [openMaster, setOpenMaster] = useState(true)
@@ -46,7 +48,15 @@ export function AppSidebar() {
             {/* ================= HEADER ================= */}
             <SidebarHeader>
                 <div className="flex h-10 items-center gap-2 px-2 text-lg font-semibold">
-                    📊 <span className="group-data-[collapsible=icon]:hidden">Quisioner</span>
+                    <img
+                        src={logoIcon}
+                        alt="Quisioner Logo"
+                        className="h-6 w-6 object-contain"
+                    />
+
+                    <span className="group-data-[collapsible=icon]:hidden">
+                        Quisioner
+                    </span>
                 </div>
             </SidebarHeader>
 
