@@ -19,7 +19,6 @@ import {
 import {
     LayoutDashboard,
     Database,
-    ClipboardList,
     Users,
     BarChart3,
     FileText,

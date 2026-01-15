@@ -5,6 +5,8 @@ import KategoriPage from "@/pages/KategoriPage"
 import BankPertanyaanPage from "@/pages/BankPertanyaan"
 import RespondenPage from "@/pages/RespondenPage"
 import HasilAnalisisPage from "@/pages/HasilAnalisisPage"
+import LaporanPage from "./pages/LaporanPage"
+import TindakLanjutPage from "./pages/TindakLanjutPage"
 
 export const router = createBrowserRouter([
     {
@@ -30,6 +32,14 @@ export const router = createBrowserRouter([
             {
                 path: "hasil",
                 element: <HasilAnalisisPage />,
+            },
+            {
+                path: "laporan",
+                element: <LaporanPage />,
+            },
+            {
+                path: "rtl",
+                element: <TindakLanjutPage />,
             },
 
         ],
