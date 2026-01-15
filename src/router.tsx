@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "@/App"
-// import DashboardPage from "@/pages/DashboardPage"
+import DashboardPage from "@/pages/DashboardPage"
 import KategoriPage from "@/pages/KategoriPage"
 import BankPertanyaanPage from "@/pages/BankPertanyaan"
 import RespondenPage from "@/pages/RespondenPage"
@@ -11,10 +11,10 @@ export const router = createBrowserRouter([
         path: "/",
         element: <App />,     // ← Layout (sidebar, header, breadcrumbs)
         children: [
-            // {
-            //     index: true,     // "/"
-            //     element: <DashboardPage />,
-            // },
+            {
+                index: true,     // "/"
+                element: <DashboardPage />,
+            },
             {
                 path: "kategori", // "/kategori"
                 element: <KategoriPage />,

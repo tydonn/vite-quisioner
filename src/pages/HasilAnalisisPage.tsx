@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import {
     BarChart,
@@ -101,8 +101,9 @@ export default function HasilAnalisisPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Distribusi Kepuasan</CardTitle>
+                        <CardDescription>Perbandingan jumlah Responden berdasarkan tingkat Kepuasan</CardDescription>
                     </CardHeader>
-                    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                    <ChartContainer config={chartConfig} >
                         <BarChart accessibilityLayer data={chartData}>
                             <CartesianGrid vertical={false} />
                             <XAxis
@@ -125,7 +126,7 @@ export default function HasilAnalisisPage() {
 
 
                 {/* Pie Chart */}
-                <Card>
+                {/* <Card>
                     <CardHeader>
                         <CardTitle>Jenis Responden</CardTitle>
                     </CardHeader>
@@ -147,7 +148,7 @@ export default function HasilAnalisisPage() {
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
-                </Card>
+                </Card> */}
 
             </div>
         </div>
