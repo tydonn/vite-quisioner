@@ -4,12 +4,6 @@ import {
     BarChart,
     Bar,
     XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
     CartesianGrid,
 } from "recharts"
 import { type ChartConfig } from "@/components/ui/chart"
@@ -20,19 +14,19 @@ const kpi = [
     { title: "Completion Rate", value: "92%" },
 ]
 
-const barData = [
-    { label: "Sangat Puas", value: 52 },
-    { label: "Puas", value: 40 },
-    { label: "Netral", value: 22 },
-    { label: "Tidak Puas", value: 10 },
-    { label: "Sangat Tidak Puas", value: 4 },
-]
+// const barData = [
+//     { label: "Sangat Puas", value: 52 },
+//     { label: "Puas", value: 40 },
+//     { label: "Netral", value: 22 },
+//     { label: "Tidak Puas", value: 10 },
+//     { label: "Sangat Tidak Puas", value: 4 },
+// ]
 
-const pieData = [
-    { name: "Mahasiswa", value: 80 },
-    { name: "Staff", value: 30 },
-    { name: "Dosen", value: 18 },
-]
+// const pieData = [
+//     { name: "Mahasiswa", value: 80 },
+//     { name: "Staff", value: 30 },
+//     { name: "Dosen", value: 18 },
+// ]
 
 //example
 const chartData = [
