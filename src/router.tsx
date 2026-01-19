@@ -7,6 +7,7 @@ import RespondenPage from "@/pages/RespondenPage"
 import HasilAnalisisPage from "@/pages/HasilAnalisisPage"
 import LaporanPage from "./pages/LaporanPage"
 import TindakLanjutPage from "./pages/TindakLanjutPage"
+import BankPertanyaanTambahPage from "./pages/BankPertanyaanTambahPage"
 
 export const router = createBrowserRouter([
     {
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
             {
                 path: "rtl",
                 element: <TindakLanjutPage />,
+            },
+            {
+                path: "bank/tambah-pertanyaan",
+                element: <BankPertanyaanTambahPage />,
             },
 
         ],

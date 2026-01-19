@@ -9,6 +9,7 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 
 const data = [
     {
@@ -47,7 +48,11 @@ export default function BankPertanyaanPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Bank Pertanyaan</h1>
-                <Button>+ Tambah Pertanyaan</Button>
+                <Button asChild>
+                    <Link to="/bank/tambah-pertanyaan">
+                        + Tambah Pertanyaan
+                    </Link>
+                </Button>
             </div>
 
             {/* Table */}

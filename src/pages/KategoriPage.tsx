@@ -17,7 +17,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { Link, MoreHorizontal, Plus } from "lucide-react"
 
 const initialData: Kategori[] = [
     {
@@ -59,6 +59,7 @@ export default function KategoriPage() {
                     <Plus className="mr-2 size-4" />
                     Tambah
                 </Button>
+
             </div>
 
             <Input
