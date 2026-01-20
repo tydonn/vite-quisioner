@@ -10,6 +10,9 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
+import { useState } from "react"
+import type { Pertanyaan } from "@/features/kategori/types"
+import { Input } from "@/components/ui/input"
 
 const data = [
     {
@@ -41,7 +44,45 @@ const data = [
     },
 ]
 
+const initialData: Pertanyaan[] = [
+    {
+        id: 1,
+        kode: "P001",
+        pertanyaan: "Seberapa puas Anda terhadap layanan kami?",
+        kategori: "Kepuasan",
+        tipe: "Likert",
+        wajib: true,
+        status: "Aktif",
+    },
+    {
+        id: 2,
+        kode: "P002",
+        pertanyaan: "Apakah Anda akan merekomendasikan kami?",
+        kategori: "Loyalitas",
+        tipe: "Single Choice",
+        wajib: true,
+        status: "Aktif",
+    },
+    {
+        id: 3,
+        kode: "P003",
+        pertanyaan: "Saran untuk perbaikan?",
+        kategori: "Feedback",
+        tipe: "Text",
+        wajib: false,
+        status: "Nonaktif",
+    },
+]
+
 export default function BankPertanyaanPage() {
+    const [data] = useState(initialData)
+    const [search, setSearch] = useState("")
+
+    const filtered = data.filter(
+        (d) =>
+            d.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
+            d.kode.toLowerCase().includes(search.toLowerCase())
+    )
     return (
         <div className="space-y-4">
 
@@ -54,6 +95,13 @@ export default function BankPertanyaanPage() {
                     </Link>
                 </Button>
             </div>
+
+            <Input
+                placeholder="Cari pertanyaan..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-sm"
+            />
 
             {/* Table */}
             <div className="rounded-md border bg-background">
@@ -71,7 +119,7 @@ export default function BankPertanyaanPage() {
                     </TableHeader>
 
                     <TableBody>
-                        {data.map((item) => (
+                        {filtered.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell className="font-medium">{item.kode}</TableCell>
                                 <TableCell className="max-w-sm truncate">

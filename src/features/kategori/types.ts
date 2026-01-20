@@ -7,3 +7,13 @@ export type Kategori = {
     tipe: "likert" | "boolean" | "numeric"
     aktif: boolean
 }
+
+export type Pertanyaan = {
+    id: number
+    kode: string
+    pertanyaan: string
+    kategori: string
+    tipe: string
+    wajib: true | false
+    status: "Aktif" | "Nonaktif"
+}
