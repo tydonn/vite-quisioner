@@ -14,36 +14,6 @@ import { useState } from "react"
 import type { Pertanyaan } from "@/features/kategori/types"
 import { Input } from "@/components/ui/input"
 
-const data = [
-    {
-        id: 1,
-        kode: "P001",
-        pertanyaan: "Seberapa puas Anda terhadap layanan kami?",
-        kategori: "Kepuasan",
-        tipe: "Likert",
-        wajib: true,
-        status: "Aktif",
-    },
-    {
-        id: 2,
-        kode: "P002",
-        pertanyaan: "Apakah Anda akan merekomendasikan kami?",
-        kategori: "Loyalitas",
-        tipe: "Single Choice",
-        wajib: true,
-        status: "Aktif",
-    },
-    {
-        id: 3,
-        kode: "P003",
-        pertanyaan: "Saran untuk perbaikan?",
-        kategori: "Feedback",
-        tipe: "Text",
-        wajib: false,
-        status: "Nonaktif",
-    },
-]
-
 const initialData: Pertanyaan[] = [
     {
         id: 1,

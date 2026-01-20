@@ -17,7 +17,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Link, MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus } from "lucide-react"
 
 const initialData: Kategori[] = [
     {
