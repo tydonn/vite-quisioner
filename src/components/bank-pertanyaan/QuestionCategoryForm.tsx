@@ -2,8 +2,6 @@ import {
     HashIcon,
     LayersIcon,
     PercentIcon,
-    ListIcon,
-    PowerIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
