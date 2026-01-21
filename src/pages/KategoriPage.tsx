@@ -17,7 +17,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const initialData: Kategori[] = [
     {
@@ -54,12 +55,11 @@ export default function KategoriPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Kategori Pertanyaan</h1>
-
                 <Button>
-                    <Plus className="mr-2 size-4" />
-                    Tambah
+                    <Link to="/bank/tambah-kategori">
+                        + Tambah Kategori
+                    </Link>
                 </Button>
-
             </div>
 
             <Input
