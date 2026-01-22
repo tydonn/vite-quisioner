@@ -45,7 +45,7 @@ const responses: ResponseItem[] = [
 
 export function RecentResponses() {
     return (
-        <Card>
+        <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle>Respon Terbaru</CardTitle>
                 <CardDescription>January - December 2025</CardDescription>

@@ -8,6 +8,7 @@ import {
     InputGroupAddon,
     InputGroupInput,
 } from "@/components/ui/input-group"
+import { Link } from "react-router-dom"
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false)
@@ -56,7 +57,8 @@ export default function LoginForm() {
 
             {/* Action */}
             <Button type="submit" className="w-full">
-                Masuk
+                <Link to="/dashboard">Masuk</Link>
+
             </Button>
         </form>
     )

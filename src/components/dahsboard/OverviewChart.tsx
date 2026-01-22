@@ -49,7 +49,7 @@ const chartConfig = {
 
 export function OverviewChart() {
     return (
-        <Card>
+        <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle>Responden 2025</CardTitle>
                 <CardDescription>January - December 2025</CardDescription>

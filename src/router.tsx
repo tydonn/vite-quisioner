@@ -22,7 +22,8 @@ export const router = createBrowserRouter([
                 element: <AuthLayout />,
                 children: [
                     {
-                        path: "/login",
+                        // path: "/login",
+                        index: true,
                         element: <LoginPage />,
                     },
                 ],
@@ -32,8 +33,12 @@ export const router = createBrowserRouter([
             {
                 element: <DashboardLayout />,
                 children: [
+                    // {
+                    //     index: true,
+                    //     element: <DashboardPage />,
+                    // },
                     {
-                        index: true,
+                        path: "dashboard",
                         element: <DashboardPage />,
                     },
                     {

@@ -11,7 +11,6 @@ export default function DashboardLayout() {
     return (
         <SidebarProvider>
             <AppSidebar />
-
             <SidebarInset>
                 <header className="h-14 border-b flex items-center gap-2 px-4">
                     <SidebarTrigger />

@@ -64,7 +64,7 @@ export function IssueAlert() {
     }
 
     return (
-        <Card>
+        <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle>Isu Prioritas</CardTitle>
                 <CardDescription>
