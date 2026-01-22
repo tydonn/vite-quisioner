@@ -8,7 +8,7 @@ export default function LoginPage() {
                 <div className="mb-6 text-center">
                     <h1 className="text-2xl font-semibold">Login</h1>
                     <p className="text-sm text-muted-foreground">
-                        Masuk ke sistem Quisioner
+                        Masuk ke Dashboard Quisioner
                     </p>
                 </div>
 
