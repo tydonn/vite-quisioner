@@ -53,7 +53,7 @@ export default function LaporanPage() {
             </div>
 
             {/* Table */}
-            <Card>
+            <Card className="shadow-sm">
                 <CardHeader>
                     <CardTitle>Daftar Laporan</CardTitle>
                 </CardHeader>

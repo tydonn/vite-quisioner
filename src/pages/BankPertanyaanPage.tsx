@@ -70,11 +70,11 @@ export default function BankPertanyaanPage() {
                 placeholder="Cari pertanyaan..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm"
+                className="max-w-sm shadow-sm"
             />
 
             {/* Table */}
-            <div className="rounded-md border bg-background">
+            <div className="rounded-md border bg-background shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>

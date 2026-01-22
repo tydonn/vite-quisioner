@@ -38,11 +38,11 @@ export default function RespondenPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Responden</h1>
-                <Button variant="outline">Export</Button>
+                <Button className="shadow-sm" variant="outline">Export</Button>
             </div>
 
             {/* Table */}
-            <div className="rounded-md border bg-background">
+            <div className="rounded-md border bg-background shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>

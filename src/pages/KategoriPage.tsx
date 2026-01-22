@@ -66,10 +66,10 @@ export default function KategoriPage() {
                 placeholder="Cari kategori..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm"
+                className="max-w-sm shadow-sm"
             />
 
-            <div className="border rounded-lg">
+            <div className="border rounded-lg shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>

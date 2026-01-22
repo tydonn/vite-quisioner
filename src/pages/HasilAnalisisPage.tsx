@@ -75,7 +75,7 @@ export default function HasilAnalisisPage() {
             {/* KPI */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {kpi.map((item) => (
-                    <Card key={item.title}>
+                    <Card className="shadow-sm" key={item.title}>
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm text-muted-foreground">
                                 {item.title}
@@ -92,7 +92,7 @@ export default function HasilAnalisisPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {/* Bar Chart */}
-                <Card>
+                <Card className="shadow-sm">
                     <CardHeader>
                         <CardTitle>Distribusi Kepuasan</CardTitle>
                         <CardDescription>Perbandingan jumlah Responden berdasarkan tingkat Kepuasan</CardDescription>

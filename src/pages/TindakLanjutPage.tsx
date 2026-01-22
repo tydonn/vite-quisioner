@@ -75,7 +75,7 @@ export default function TindakLanjutPage() {
             </div>
 
             {/* Table */}
-            <Card>
+            <Card className="shadow-sm">
                 <CardHeader>
                     <CardTitle>Daftar Tindak Lanjut</CardTitle>
                 </CardHeader>
