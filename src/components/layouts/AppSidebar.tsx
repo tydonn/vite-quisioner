@@ -221,6 +221,7 @@ export function AppSidebar() {
                         <span>v1.0 • Quisioner Admin</span>
                     )}
                 </div>
+
             </SidebarFooter>
         </Sidebar>
     )

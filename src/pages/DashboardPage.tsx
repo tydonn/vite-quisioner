@@ -3,6 +3,7 @@ import { OverviewChart } from "@/components/dahsboard/OverviewChart"
 import { RecentResponses } from "@/components/dahsboard/RecentResponses"
 import { IssueAlert } from "@/components/dahsboard/IssueAlert"
 import { ChartLineInteractive } from "@/components/dahsboard/ChartLineInteractive"
+import { LogoutButton } from "@/components/login/LogoutButton"
 
 export default function DashboardPage() {
     return (
@@ -17,6 +18,9 @@ export default function DashboardPage() {
             </div>
 
             <RecentResponses />
+
+            <LogoutButton />
+
         </div>
     )
 }
