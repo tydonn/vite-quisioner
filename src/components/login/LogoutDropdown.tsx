@@ -7,43 +7,37 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-    CreditCardIcon,
     LogOutIcon,
     SettingsIcon,
     UserIcon,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import api from "@/lib/api"
 
 export function LogoutDropdown() {
     const navigate = useNavigate()
 
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem("token")
-
-            await axios.post(
-                "http://127.0.0.1:8000/api/logout",
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            )
+            // 🔐 revoke token di backend
+            await api.post("/logout")
         } catch (error) {
-            // kalau token sudah invalid, tetap lanjut logout
-            console.error(error)
+            // kalau token sudah expired / invalid, tidak masalah
+            console.error("Logout error:", error)
         } finally {
+            // 🧹 bersihkan client state
             localStorage.removeItem("token")
-            navigate("/")
+            localStorage.removeItem("user")
+
+            // 🔁 balik ke login
+            navigate("/", { replace: true })
         }
     }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="ghost" size="icon" className="rounded-full">
                     <UserIcon className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>

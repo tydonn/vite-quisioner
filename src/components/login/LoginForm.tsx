@@ -12,6 +12,8 @@ import {
 
 import api from "@/lib/api"
 
+import { useAuth } from "@/contexts/AuthContext"
+
 export default function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -19,6 +21,8 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate()
+
+    const { fetchUser } = useAuth()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -32,8 +36,7 @@ export default function LoginForm() {
 
             // simpan token & user
             localStorage.setItem("token", res.data.token)
-            localStorage.setItem("user", JSON.stringify(res.data.user))
-
+            await fetchUser()
             navigate("/dashboard")
         } catch (err: any) {
             alert("Email atau password salah")
