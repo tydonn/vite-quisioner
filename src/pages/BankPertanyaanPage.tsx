@@ -9,50 +9,47 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
-import { useState } from "react"
-import type { Pertanyaan } from "@/features/kategori/types"
 import { Input } from "@/components/ui/input"
 
-const initialData: Pertanyaan[] = [
-    {
-        id: 1,
-        kode: "P001",
-        pertanyaan: "Seberapa puas Anda terhadap layanan kami?",
-        kategori: "Kepuasan",
-        tipe: "Likert",
-        wajib: true,
-        status: "Aktif",
-    },
-    {
-        id: 2,
-        kode: "P002",
-        pertanyaan: "Apakah Anda akan merekomendasikan kami?",
-        kategori: "Loyalitas",
-        tipe: "Single Choice",
-        wajib: true,
-        status: "Aktif",
-    },
-    {
-        id: 3,
-        kode: "P003",
-        pertanyaan: "Saran untuk perbaikan?",
-        kategori: "Feedback",
-        tipe: "Text",
-        wajib: false,
-        status: "Nonaktif",
-    },
-]
+import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+
+import type { PertanyaanView } from "@/features/kategori/pertanyaan/view-types"
+import type { Aspect } from "@/features/kategori/pertanyaan/types"
+import { mapAspectListToView } from "@/features/kategori/pertanyaan/mapper"
+
+import api from "@/lib/api" // axios instance
 
 export default function BankPertanyaanPage() {
-    const [data] = useState(initialData)
+    const [data, setData] = useState<PertanyaanView[]>([])
+    const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
 
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const res = await api.get<{ data: Aspect[] }>("/questions")
+
+                const mapped = mapAspectListToView(res.data.data)
+                setData(mapped)
+            } catch (error) {
+                console.error("Gagal mengambil data pertanyaan", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [])
     const filtered = data.filter(
         (d) =>
             d.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
-            d.kode.toLowerCase().includes(search.toLowerCase())
+            d.kategori.toLowerCase().includes(search.toLowerCase())
     )
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
     return (
         <div className="space-y-4">
 
@@ -73,7 +70,6 @@ export default function BankPertanyaanPage() {
                 className="max-w-sm shadow-sm"
             />
 
-            {/* Table */}
             <div className="rounded-md border bg-background shadow-sm">
                 <Table>
                     <TableHeader>
@@ -91,19 +87,21 @@ export default function BankPertanyaanPage() {
                     <TableBody>
                         {filtered.map((item) => (
                             <TableRow key={item.id}>
-                                <TableCell className="font-medium">{item.kode}</TableCell>
+                                <TableCell className="font-medium">
+                                    {item.kode}
+                                </TableCell>
+
                                 <TableCell className="max-w-sm truncate">
                                     {item.pertanyaan}
                                 </TableCell>
+
                                 <TableCell>{item.kategori}</TableCell>
                                 <TableCell>{item.tipe}</TableCell>
 
                                 <TableCell>
-                                    {item.wajib ? (
-                                        <Badge variant="default">Ya</Badge>
-                                    ) : (
-                                        <Badge variant="secondary">Tidak</Badge>
-                                    )}
+                                    <Badge variant={item.wajib ? "default" : "secondary"}>
+                                        {item.wajib ? "Ya" : "Tidak"}
+                                    </Badge>
                                 </TableCell>
 
                                 <TableCell>
@@ -127,7 +125,6 @@ export default function BankPertanyaanPage() {
                     </TableBody>
                 </Table>
             </div>
-
         </div>
     )
 }
