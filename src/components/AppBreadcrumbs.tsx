@@ -19,12 +19,12 @@ export function AppBreadcrumbs() {
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                        <Link to="/">Dashboard</Link>
+                        <Link to="/dashboard">Dashboard</Link>
                     </BreadcrumbLink>
                 </BreadcrumbItem>
 
                 {segments.map((seg, i) => {
-                    const href = "/" + segments.slice(0, i + 1).join("/")
+                    const href = "/dashboard" + segments.slice(0, i + 1).join("/")
                     const label = seg.replace("-", " ")
 
                     return (
