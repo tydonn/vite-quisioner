@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 
-import type { PertanyaanView } from "@/features/kategori/pertanyaan/view-types"
-import type { Aspect } from "@/features/kategori/pertanyaan/types"
-import { mapAspectListToView } from "@/features/kategori/pertanyaan/mapper"
+import type { PertanyaanView } from "@/features/pertanyaan/view-types"
+import type { Aspect } from "@/features/pertanyaan/types"
+import { mapAspectListToView } from "@/features/pertanyaan/mapper"
 
 import api from "@/lib/api" // axios instance
 
