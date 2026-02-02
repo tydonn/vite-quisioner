@@ -20,10 +20,16 @@ import { mapAspectListToView } from "@/features/question/mapper"
 
 import api from "@/lib/api" // axios instance
 
+import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
+
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+
+    //for edit button
+    const [selected, setSelected] = useState<PertanyaanView | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
@@ -114,7 +120,7 @@ export default function BankPertanyaanPage() {
                                 </TableCell>
 
                                 <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline">
+                                    <Button size="sm" variant="outline" onClick={() => setSelected(item)}>
                                         Edit
                                     </Button>
                                     {/* <Button size="sm" variant="destructive">
@@ -125,6 +131,16 @@ export default function BankPertanyaanPage() {
                         ))}
                     </TableBody>
                 </Table>
+
+                <EditPertanyaanDialog
+                    open={!!selected}
+                    data={selected}
+                    onClose={() => setSelected(null)}
+                    onSuccess={async () => {
+                        const res = await api.get("/questions")
+                        setData(mapAspectListToView(res.data.data))
+                    }}
+                />
             </div>
         </div>
     )
