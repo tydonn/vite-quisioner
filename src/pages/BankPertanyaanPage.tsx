@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 
-import type { PertanyaanView } from "@/features/pertanyaan/view-types"
-import type { Aspect } from "@/features/pertanyaan/types"
-import { mapAspectListToView } from "@/features/pertanyaan/mapper"
+import type { PertanyaanView } from "@/features/question/view-types"
+import type { Aspect } from "@/features/question/types"
+import { mapAspectListToView } from "@/features/question/mapper"
 
 import api from "@/lib/api" // axios instance
 
@@ -41,6 +41,7 @@ export default function BankPertanyaanPage() {
 
         fetchData()
     }, [])
+
     const filtered = data.filter(
         (d) =>
             d.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
@@ -116,9 +117,9 @@ export default function BankPertanyaanPage() {
                                     <Button size="sm" variant="outline">
                                         Edit
                                     </Button>
-                                    <Button size="sm" variant="destructive">
+                                    {/* <Button size="sm" variant="destructive">
                                         Hapus
-                                    </Button>
+                                    </Button> */}
                                 </TableCell>
                             </TableRow>
                         ))}

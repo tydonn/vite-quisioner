@@ -1,5 +1,6 @@
-import { useState } from "react"
-import type { Kategori } from "@/features/kategori/types"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -17,33 +18,35 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from "lucide-react"
-import { Link } from "react-router-dom"
 
-const initialData: Kategori[] = [
-    {
-        id: 1,
-        kode: "TD",
-        nama: "Kualitas Dosen",
-        deskripsi: "Penilaian terhadap kualitas pengajar",
-        bobot: 20,
-        tipe: "likert",
-        aktif: true,
-    },
-    {
-        id: 2,
-        kode: "INF",
-        nama: "Sarana & Prasarana",
-        deskripsi: "Fasilitas kampus",
-        bobot: 15,
-        tipe: "likert",
-        aktif: false,
-    },
-]
+import { MoreHorizontal } from "lucide-react"
+
+import type { Category } from "@/features/category/types"
+import type { KategoriView } from "@/features/category/view-types"
+import { mapCategoryListToView } from "@/features/category/mapper"
+
+import api from "@/lib/api"
 
 export default function KategoriPage() {
-    const [data] = useState(initialData)
+    const [data, setData] = useState<KategoriView[]>([])
+    const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const res = await api.get<{ data: Category[] }>("/categories")
+                const mapped = mapCategoryListToView(res.data.data)
+                setData(mapped)
+            } catch (error) {
+                console.error("Gagal mengambil data kategori", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [])
 
     const filtered = data.filter(
         (d) =>
@@ -51,17 +54,23 @@ export default function KategoriPage() {
             d.kode.toLowerCase().includes(search.toLowerCase())
     )
 
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
     return (
         <div className="space-y-4">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Kategori Pertanyaan</h1>
-                <Button>
+                <Button asChild>
                     <Link to="/bank/tambah-kategori">
                         + Tambah Kategori
                     </Link>
                 </Button>
             </div>
 
+            {/* Search */}
             <Input
                 placeholder="Cari kategori..."
                 value={search}
@@ -69,14 +78,14 @@ export default function KategoriPage() {
                 className="max-w-sm shadow-sm"
             />
 
+            {/* Table */}
             <div className="border rounded-lg shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Kode</TableHead>
                             <TableHead>Nama</TableHead>
-                            <TableHead>Bobot</TableHead>
-                            <TableHead>Tipe</TableHead>
+                            <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="w-[60px]" />
                         </TableRow>
@@ -85,7 +94,10 @@ export default function KategoriPage() {
                     <TableBody>
                         {filtered.map((row) => (
                             <TableRow key={row.id}>
-                                <TableCell className="font-medium">{row.kode}</TableCell>
+                                <TableCell className="font-medium">
+                                    {row.kode}
+                                </TableCell>
+
                                 <TableCell>
                                     <div>
                                         <div>{row.nama}</div>
@@ -94,13 +106,21 @@ export default function KategoriPage() {
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell>{row.bobot}%</TableCell>
-                                <TableCell>{row.tipe}</TableCell>
+
+                                <TableCell>{row.urutan}</TableCell>
+
                                 <TableCell>
-                                    <Badge variant={row.aktif ? "default" : "secondary"}>
-                                        {row.aktif ? "Aktif" : "Nonaktif"}
+                                    <Badge
+                                        variant={
+                                            row.status === "Aktif"
+                                                ? "default"
+                                                : "secondary"
+                                        }
+                                    >
+                                        {row.status}
                                     </Badge>
                                 </TableCell>
+
                                 <TableCell>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -110,9 +130,9 @@ export default function KategoriPage() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem className="text-destructive">
+                                            {/* <DropdownMenuItem className="text-destructive">
                                                 Hapus
-                                            </DropdownMenuItem>
+                                            </DropdownMenuItem> */}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
