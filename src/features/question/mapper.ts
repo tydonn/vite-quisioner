@@ -29,9 +29,10 @@ export function mapAspectToPertanyaanView(
         id: aspect.AspectID,
         kode: formatKode(aspect.AspectID),
         pertanyaan: aspect.AspectText,
+        kategoriId: aspect.CategoryID,
         kategori: aspect.category?.CategoryName ?? "-",
         tipe: mapAnswerType(aspect.AnswerType),
-        wajib: true,
+        urutan: aspect.SortOrder,
         status: mapStatus(aspect.IsActive),
     }
 }

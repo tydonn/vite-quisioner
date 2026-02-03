@@ -29,7 +29,7 @@ export default function BankPertanyaanPage() {
 
     //for edit button
     const [selected, setSelected] = useState<PertanyaanView | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    // const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
@@ -85,7 +85,7 @@ export default function BankPertanyaanPage() {
                             <TableHead>Pertanyaan</TableHead>
                             <TableHead>Kategori</TableHead>
                             <TableHead>Tipe</TableHead>
-                            <TableHead>Wajib</TableHead>
+                            <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
@@ -103,13 +103,10 @@ export default function BankPertanyaanPage() {
                                 </TableCell>
 
                                 <TableCell>{item.kategori}</TableCell>
+
                                 <TableCell>{item.tipe}</TableCell>
 
-                                <TableCell>
-                                    <Badge variant={item.wajib ? "default" : "secondary"}>
-                                        {item.wajib ? "Ya" : "Tidak"}
-                                    </Badge>
-                                </TableCell>
+                                <TableCell>{item.urutan}</TableCell>
 
                                 <TableCell>
                                     <Badge

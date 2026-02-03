@@ -24,6 +24,7 @@ import { MoreHorizontal } from "lucide-react"
 import type { Category } from "@/features/category/types"
 import type { KategoriView } from "@/features/category/view-types"
 import { mapCategoryListToView } from "@/features/category/mapper"
+import { EditCategoryDialog } from "@/features/category/components/EditCategoryDialog"
 
 import api from "@/lib/api"
 
@@ -31,6 +32,7 @@ export default function KategoriPage() {
     const [data, setData] = useState<KategoriView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [selected, setSelected] = useState<KategoriView | null>(null)
 
     useEffect(() => {
         async function fetchData() {
@@ -129,7 +131,9 @@ export default function KategoriPage() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => setSelected(row)}>
+                                                Edit
+                                            </DropdownMenuItem>
                                             {/* <DropdownMenuItem className="text-destructive">
                                                 Hapus
                                             </DropdownMenuItem> */}
@@ -141,6 +145,16 @@ export default function KategoriPage() {
                     </TableBody>
                 </Table>
             </div>
+
+            <EditCategoryDialog
+                open={!!selected}
+                data={selected}
+                onClose={() => setSelected(null)}
+                onSuccess={async () => {
+                    const res = await api.get<{ data: Category[] }>("/categories")
+                    setData(mapCategoryListToView(res.data.data))
+                }}
+            />
         </div>
     )
 }

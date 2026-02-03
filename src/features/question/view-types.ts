@@ -9,9 +9,10 @@ export interface PertanyaanView {
     id: number
     kode: string
     pertanyaan: string
+    kategoriId: number
     kategori: string
     tipe: TipeJawaban
-    wajib: boolean
+    urutan: number
     status: StatusAktif
 }
 
