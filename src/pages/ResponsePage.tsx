@@ -93,15 +93,15 @@ export default function ResponsePage() {
                     <TableBody>
                         {filtered.map((row) => (
                             <TableRow key={row.id}>
-                                <TableCell className="font-medium">
+                                <TableCell className="font-medium py-3">
                                     {row.id}
                                 </TableCell>
-                                <TableCell>{row.mahasiswaId}</TableCell>
-                                <TableCell>{row.dosenId}</TableCell>
-                                <TableCell>{row.matakuliahId}</TableCell>
-                                <TableCell>{row.tahunAkademik}</TableCell>
-                                <TableCell>{row.semester}</TableCell>
-                                <TableCell>{row.createdAt}</TableCell>
+                                <TableCell className="py-3">{row.mahasiswaId}</TableCell>
+                                <TableCell className="py-3">{row.dosenId}</TableCell>
+                                <TableCell className="py-3">{row.matakuliahId}</TableCell>
+                                <TableCell className="py-3">{row.tahunAkademik}</TableCell>
+                                <TableCell className="py-3">{row.semester}</TableCell>
+                                <TableCell className="py-3">{row.createdAt}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

@@ -27,6 +27,27 @@ import { mapChoiceListToView } from "@/features/choice/mapper"
 import { EditChoiceDialog } from "@/features/choice/components/EditChoiceDialog"
 import api from "@/lib/api"
 
+function getLabelClassName(value: string) {
+    const normalized = value.toLowerCase()
+    if (normalized.includes("sangat puas")) {
+        return "bg-emerald-100 text-emerald-700"
+    }
+    if (normalized.includes("tidak puas")) {
+        return "bg-rose-100 text-rose-700"
+    }
+    if (normalized.includes("kurang puas")) {
+        return "bg-orange-100 text-orange-700"
+    }
+    if (normalized.includes("cukup puas")) {
+        return "bg-lime-100 text-lime-700"
+    }
+    if (normalized.includes("puas")) {
+        return "bg-green-100 text-green-700"
+    }
+
+    return "bg-muted text-foreground"
+}
+
 export default function PilihanPage() {
     const [data, setData] = useState<ChoiceView[]>([])
     const [loading, setLoading] = useState(true)
@@ -113,7 +134,15 @@ export default function PilihanPage() {
                                     {row.pertanyaan}
                                 </TableCell>
 
-                                <TableCell>{row.label}</TableCell>
+                                <TableCell>
+                                    <span
+                                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getLabelClassName(
+                                            row.label
+                                        )}`}
+                                    >
+                                        {row.label}
+                                    </span>
+                                </TableCell>
 
                                 <TableCell>{row.nilai}</TableCell>
 
