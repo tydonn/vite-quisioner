@@ -22,3 +22,16 @@ export interface Aspect {
 export interface AspectResponse {
     data: Aspect[]
 }
+
+export interface Pagination {
+    current_page: number
+    per_page: number
+    total: number
+    last_page: number
+}
+
+export interface AspectListResponse {
+    success: boolean
+    data: Aspect[]
+    pagination: Pagination
+}

@@ -21,18 +21,17 @@ import {
 
 import { MoreHorizontal } from "lucide-react"
 
-import type { CategoryListResponse } from "@/features/category/types"
-import type { KategoriView } from "@/features/category/view-types"
-import { mapCategoryListToView } from "@/features/category/mapper"
-import { EditCategoryDialog } from "@/features/category/components/EditCategoryDialog"
-
+import type { ChoiceListResponse } from "@/features/choice/types"
+import type { ChoiceView } from "@/features/choice/view-types"
+import { mapChoiceListToView } from "@/features/choice/mapper"
+import { EditChoiceDialog } from "@/features/choice/components/EditChoiceDialog"
 import api from "@/lib/api"
 
-export default function KategoriPage() {
-    const [data, setData] = useState<KategoriView[]>([])
+export default function PilihanPage() {
+    const [data, setData] = useState<ChoiceView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
-    const [selected, setSelected] = useState<KategoriView | null>(null)
+    const [selected, setSelected] = useState<ChoiceView | null>(null)
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
     const [lastPage, setLastPage] = useState(1)
@@ -41,18 +40,17 @@ export default function KategoriPage() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await api.get<CategoryListResponse>("/categories", {
+                const res = await api.get<ChoiceListResponse>("/choices", {
                     params: {
                         page,
                         per_page: perPage,
                     },
                 })
-                const mapped = mapCategoryListToView(res.data.data)
-                setData(mapped)
+                setData(mapChoiceListToView(res.data.data))
                 setLastPage(res.data.pagination.last_page)
                 setTotal(res.data.pagination.total)
             } catch (error) {
-                console.error("Gagal mengambil data kategori", error)
+                console.error("Gagal mengambil data pilihan", error)
             } finally {
                 setLoading(false)
             }
@@ -63,7 +61,8 @@ export default function KategoriPage() {
 
     const filtered = data.filter(
         (d) =>
-            d.nama.toLowerCase().includes(search.toLowerCase()) ||
+            d.label.toLowerCase().includes(search.toLowerCase()) ||
+            d.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
             d.kode.toLowerCase().includes(search.toLowerCase())
     )
 
@@ -73,31 +72,30 @@ export default function KategoriPage() {
 
     return (
         <div className="space-y-4">
-            {/* Header */}
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Kategori Pertanyaan</h1>
+                <h1 className="text-xl font-semibold">Pilihan Jawaban</h1>
                 <Button asChild>
-                    <Link to="/bank/tambah-kategori">
-                        + Tambah Kategori
+                    <Link to="/bank/tambah-pilihan">
+                        + Tambah Pilihan
                     </Link>
                 </Button>
             </div>
 
-            {/* Search */}
             <Input
-                placeholder="Cari kategori..."
+                placeholder="Cari pilihan..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="max-w-sm shadow-sm"
             />
 
-            {/* Table */}
             <div className="border rounded-lg shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Kode</TableHead>
-                            <TableHead>Nama</TableHead>
+                            <TableHead>Pertanyaan</TableHead>
+                            <TableHead>Label</TableHead>
+                            <TableHead>Nilai</TableHead>
                             <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="w-[60px]" />
@@ -111,14 +109,13 @@ export default function KategoriPage() {
                                     {row.kode}
                                 </TableCell>
 
-                                <TableCell>
-                                    <div>
-                                        <div>{row.nama}</div>
-                                        <div className="text-xs text-muted-foreground">
-                                            {row.deskripsi}
-                                        </div>
-                                    </div>
+                                <TableCell className="max-w-sm truncate">
+                                    {row.pertanyaan}
                                 </TableCell>
+
+                                <TableCell>{row.label}</TableCell>
+
+                                <TableCell>{row.nilai}</TableCell>
 
                                 <TableCell>{row.urutan}</TableCell>
 
@@ -145,9 +142,6 @@ export default function KategoriPage() {
                                             <DropdownMenuItem onClick={() => setSelected(row)}>
                                                 Edit
                                             </DropdownMenuItem>
-                                            {/* <DropdownMenuItem className="text-destructive">
-                                                Hapus
-                                            </DropdownMenuItem> */}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -201,18 +195,18 @@ export default function KategoriPage() {
                 </div>
             </div>
 
-            <EditCategoryDialog
+            <EditChoiceDialog
                 open={!!selected}
                 data={selected}
                 onClose={() => setSelected(null)}
                 onSuccess={async () => {
-                    const res = await api.get<CategoryListResponse>("/categories", {
+                    const res = await api.get<ChoiceListResponse>("/choices", {
                         params: {
                             page,
                             per_page: perPage,
                         },
                     })
-                    setData(mapCategoryListToView(res.data.data))
+                    setData(mapChoiceListToView(res.data.data))
                     setLastPage(res.data.pagination.last_page)
                     setTotal(res.data.pagination.total)
                 }}

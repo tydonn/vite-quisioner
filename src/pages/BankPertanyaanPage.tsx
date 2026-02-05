@@ -15,7 +15,7 @@ import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 
 import type { PertanyaanView } from "@/features/question/view-types"
-import type { Aspect } from "@/features/question/types"
+import type { AspectListResponse } from "@/features/question/types"
 import { mapAspectListToView } from "@/features/question/mapper"
 
 import api from "@/lib/api" // axios instance
@@ -26,6 +26,10 @@ export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [page, setPage] = useState(1)
+    const [perPage, setPerPage] = useState(10)
+    const [lastPage, setLastPage] = useState(1)
+    const [total, setTotal] = useState(0)
 
     //for edit button
     const [selected, setSelected] = useState<PertanyaanView | null>(null)
@@ -33,11 +37,19 @@ export default function BankPertanyaanPage() {
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true)
             try {
-                const res = await api.get<{ data: Aspect[] }>("/questions")
+                const res = await api.get<AspectListResponse>("/questions", {
+                    params: {
+                        page,
+                        per_page: perPage,
+                    },
+                })
 
                 const mapped = mapAspectListToView(res.data.data)
                 setData(mapped)
+                setLastPage(res.data.pagination.last_page)
+                setTotal(res.data.pagination.total)
             } catch (error) {
                 console.error("Gagal mengambil data pertanyaan", error)
             } finally {
@@ -46,7 +58,7 @@ export default function BankPertanyaanPage() {
         }
 
         fetchData()
-    }, [])
+    }, [page, perPage])
 
     const filtered = data.filter(
         (d) =>
@@ -129,13 +141,66 @@ export default function BankPertanyaanPage() {
                     </TableBody>
                 </Table>
 
+                <div className="flex flex-col gap-3 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>Per halaman</span>
+                        <select
+                            className="rounded border px-2 py-1"
+                            value={perPage}
+                            onChange={(e) => {
+                                setPerPage(Number(e.target.value))
+                                setPage(1)
+                            }}
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                        <span>
+                            Total {total}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                            disabled={page <= 1}
+                        >
+                            Sebelumnya
+                        </Button>
+                        <div className="text-sm text-muted-foreground">
+                            Halaman {page} / {lastPage}
+                        </div>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                                setPage((prev) => Math.min(lastPage, prev + 1))
+                            }
+                            disabled={page >= lastPage}
+                        >
+                            Berikutnya
+                        </Button>
+                    </div>
+                </div>
+
                 <EditPertanyaanDialog
                     open={!!selected}
                     data={selected}
                     onClose={() => setSelected(null)}
                     onSuccess={async () => {
-                        const res = await api.get("/questions")
+                        const res = await api.get<AspectListResponse>("/questions", {
+                            params: {
+                                page,
+                                per_page: perPage,
+                            },
+                        })
                         setData(mapAspectListToView(res.data.data))
+                        setLastPage(res.data.pagination.last_page)
+                        setTotal(res.data.pagination.total)
                     }}
                 />
             </div>

@@ -2,8 +2,10 @@ import { createBrowserRouter } from "react-router-dom"
 import App from "@/App"
 import DashboardPage from "@/pages/DashboardPage"
 import KategoriPage from "@/pages/KategoriPage"
+import PilihanPage from "@/pages/PilihanPage"
 import BankPertanyaanPage from "@/pages/BankPertanyaanPage"
-import RespondenPage from "@/pages/RespondenPage"
+import ResponsePage from "@/pages/ResponsePage"
+import ResponseDetailPage from "@/pages/ResponseDetailPage"
 import HasilAnalisisPage from "@/pages/HasilAnalisisPage"
 import LaporanPage from "@/pages/LaporanPage"
 import TindakLanjutPage from "@/pages/TindakLanjutPage"
@@ -45,6 +47,10 @@ export const router = createBrowserRouter([
                         element: <KategoriPage />,
                     },
                     {
+                        path: "pilihan",
+                        element: <PilihanPage />,
+                    },
+                    {
                         path: "bank",
                         element: <BankPertanyaanPage />,
                     },
@@ -57,8 +63,12 @@ export const router = createBrowserRouter([
                         element: <BankPertanyaanTambahKategoriPage />,
                     },
                     {
-                        path: "responden",
-                        element: <RespondenPage />,
+                        path: "responden/response",
+                        element: <ResponsePage />,
+                    },
+                    {
+                        path: "responden/detail",
+                        element: <ResponseDetailPage />,
                     },
                     {
                         path: "hasil",

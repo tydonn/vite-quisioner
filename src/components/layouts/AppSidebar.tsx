@@ -40,6 +40,7 @@ import logoIcon from "@/assets/logo-icon.png"
 export function AppSidebar() {
     const { pathname } = useLocation()
     const [openMaster, setOpenMaster] = useState(true)
+    const [openResponden, setOpenResponden] = useState(true)
     const { state } = useSidebar()
 
     return (
@@ -133,6 +134,17 @@ export function AppSidebar() {
                                                 </Link>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
+
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/pilihan"}
+                                            >
+                                                <Link to="/pilihan">
+                                                    <span>Pilihan</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
                                     </SidebarMenuSub>
                                 )}
                             </SidebarMenuItem>
@@ -145,17 +157,50 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Data</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            <SidebarMenuItem>
+                            <SidebarMenuItem data-open={openResponden}>
                                 <SidebarMenuButton
-                                    asChild
-                                    isActive={pathname === "/responden"}
+                                    onClick={() => setOpenResponden(!openResponden)}
                                     tooltip="Responden"
                                 >
-                                    <Link to="/responden">
-                                        <Users />
-                                        <span>Responden</span>
-                                    </Link>
+                                    <Users />
+                                    <span>Responden</span>
                                 </SidebarMenuButton>
+
+                                <SidebarMenuAction
+                                    onClick={() => setOpenResponden(!openResponden)}
+                                    showOnHover
+                                >
+                                    <ChevronRight
+                                        className={`transition-transform ${openResponden ? "rotate-90" : ""
+                                            }`}
+                                    />
+                                </SidebarMenuAction>
+
+                                {openResponden && (
+                                    <SidebarMenuSub>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/responden/response"}
+                                            >
+                                                <Link to="/responden/response">
+                                                    <span>Response</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/responden/detail"}
+                                            >
+                                                <Link to="/responden/detail">
+                                                    <span>Response Detail</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    </SidebarMenuSub>
+                                )}
                             </SidebarMenuItem>
 
                             <SidebarMenuItem>
