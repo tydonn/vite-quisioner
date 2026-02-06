@@ -145,6 +145,17 @@ export function AppSidebar() {
                                                 </Link>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
+
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/tipe-pilihan"}
+                                            >
+                                                <Link to="/tipe-pilihan">
+                                                    <span>Tipe Pilihan</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
                                     </SidebarMenuSub>
                                 )}
                             </SidebarMenuItem>

@@ -17,6 +17,7 @@ import type { ResponseDetailView } from "@/features/response-detail/view-types"
 import { mapResponseDetailListToView } from "@/features/response-detail/mapper"
 
 import api from "@/lib/api"
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 function getJawabanClassName(value: string) {
     const normalized = value.toLowerCase()
@@ -133,7 +134,7 @@ export default function ResponseDetailPage() {
                                 </TableCell>
                                 <TableCell className="max-w-sm py-3 whitespace-normal break-words">
                                     {row.jawabanTampil === row.jawabanLabel &&
-                                    row.jawabanLabel !== "-" ? (
+                                        row.jawabanLabel !== "-" ? (
                                         <span
                                             className={`inline-flex max-w-sm items-center whitespace-normal break-words rounded-md px-2 py-1 text-xs font-medium ${getJawabanClassName(
                                                 row.jawabanTampil
@@ -179,10 +180,10 @@ export default function ResponseDetailPage() {
                         onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                         disabled={page <= 1}
                     >
-                        Sebelumnya
+                        <ChevronLeftIcon className="size-4" />
                     </Button>
                     <div className="text-sm text-muted-foreground">
-                        Halaman {page} / {lastPage}
+                        Page {page} of {lastPage}
                     </div>
                     <Button
                         size="sm"
@@ -192,7 +193,7 @@ export default function ResponseDetailPage() {
                         }
                         disabled={page >= lastPage}
                     >
-                        Berikutnya
+                        <ChevronRightIcon className="size-4" />
                     </Button>
                 </div>
             </div>

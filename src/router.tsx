@@ -14,6 +14,7 @@ import BankPertanyaanTambahKategoriPage from "@/pages/BankPertanyaanTambahKatego
 import AuthLayout from "./components/layouts/AuthLayout"
 import DashboardLayout from "./components/layouts/DashboardLayout"
 import LoginPage from "./pages/auth/LoginPage"
+import TipePilihanPage from "./pages/TipePilihanPage"
 
 export const router = createBrowserRouter([
     {
@@ -49,6 +50,10 @@ export const router = createBrowserRouter([
                     {
                         path: "pilihan",
                         element: <PilihanPage />,
+                    },
+                    {
+                        path: "tipe-pilihan",
+                        element: <TipePilihanPage />,
                     },
                     {
                         path: "bank",
