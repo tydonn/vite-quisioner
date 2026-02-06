@@ -81,7 +81,9 @@ export default function ResponseDetailPage() {
         return (
             item.responId.toString().includes(q) ||
             item.mahasiswaId.toLowerCase().includes(q) ||
+            item.mahasiswaNama.toLowerCase().includes(q) ||
             item.dosenId.toLowerCase().includes(q) ||
+            item.dosenNama.toLowerCase().includes(q) ||
             item.matakuliahId.toLowerCase().includes(q) ||
             item.tahunAkademik.toLowerCase().includes(q) ||
             item.semester.toLowerCase().includes(q) ||
@@ -124,12 +126,22 @@ export default function ResponseDetailPage() {
                                 <TableCell className="font-medium py-3">
                                     {row.responId}
                                 </TableCell>
-                                <TableCell className="py-3">{row.mahasiswaId}</TableCell>
-                                <TableCell className="py-3">{row.dosenId}</TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.mahasiswaId}</div>
+                                    <div className="text-xs text-muted-foreground break-words">
+                                        {row.mahasiswaNama}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.dosenId}</div>
+                                    <div className="text-xs text-muted-foreground break-words">
+                                        {row.dosenNama}
+                                    </div>
+                                </TableCell>
                                 <TableCell className="py-3">{row.matakuliahId}</TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>
-                                <TableCell className="max-w-sm truncate py-3">
+                                <TableCell className="max-w-xs truncate py-3">
                                     {row.pertanyaan}
                                 </TableCell>
                                 <TableCell className="max-w-sm py-3 whitespace-normal break-words">

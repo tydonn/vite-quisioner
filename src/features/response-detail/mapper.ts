@@ -12,6 +12,14 @@ function buildJawabanTampil(
     return "-"
 }
 
+function getNama(value?: {
+    Nama?: string
+    Name?: string
+    nama?: string
+}): string {
+    return value?.Nama ?? value?.Name ?? value?.nama ?? "-"
+}
+
 export function mapResponseDetailToView(
     item: ResponseDetail
 ): ResponseDetailView {
@@ -22,7 +30,9 @@ export function mapResponseDetailToView(
         id: item.DetailID,
         responId: item.ResponID,
         mahasiswaId: item.response?.MahasiswaID ?? "-",
+        mahasiswaNama: getNama(item.response?.mahasiswa),
         dosenId: item.response?.DosenID ?? "-",
+        dosenNama: getNama(item.response?.dosen),
         matakuliahId: item.response?.MatakuliahID ?? "-",
         tahunAkademik: item.response?.TahunAkademik ?? "-",
         semester: item.response?.Semester ?? "-",

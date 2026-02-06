@@ -58,6 +58,7 @@ export default function ResponsePage() {
         (item) =>
             item.mahasiswaId.toLowerCase().includes(search.toLowerCase()) ||
             item.dosenId.toLowerCase().includes(search.toLowerCase()) ||
+            item.dosenNama.toLowerCase().includes(search.toLowerCase()) ||
             item.matakuliahId.toLowerCase().includes(search.toLowerCase()) ||
             item.tahunAkademik.toLowerCase().includes(search.toLowerCase()) ||
             item.semester.toLowerCase().includes(search.toLowerCase())
@@ -82,7 +83,7 @@ export default function ResponsePage() {
                         <TableRow>
                             <TableHead>Respon ID</TableHead>
                             <TableHead>Mahasiswa ID</TableHead>
-                            <TableHead>Dosen ID</TableHead>
+                            <TableHead>Dosen</TableHead>
                             <TableHead>Matakuliah ID</TableHead>
                             <TableHead>Tahun Akademik</TableHead>
                             <TableHead>Semester</TableHead>
@@ -96,8 +97,18 @@ export default function ResponsePage() {
                                 <TableCell className="font-medium py-3">
                                     {row.id}
                                 </TableCell>
-                                <TableCell className="py-3">{row.mahasiswaId}</TableCell>
-                                <TableCell className="py-3">{row.dosenId}</TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.mahasiswaId}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {row.mahasiswaNama}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.dosenId}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {row.dosenNama}
+                                    </div>
+                                </TableCell>
                                 <TableCell className="py-3">{row.matakuliahId}</TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>

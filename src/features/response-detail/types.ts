@@ -5,6 +5,18 @@ export interface ResponseSummary {
     MatakuliahID: string
     TahunAkademik: string
     Semester: string
+    dosen?: {
+        Login?: string | number
+        Nama?: string
+        Name?: string
+        nama?: string
+    }
+    mahasiswa?: {
+        MhswID?: string
+        Nama?: string
+        Name?: string
+        nama?: string
+    }
 }
 
 export interface QuestionSummary {
@@ -20,6 +32,18 @@ export interface ChoiceSummary {
     ChoiceValue: number
 }
 
+export interface DosenSummary {
+    Login?: string | number
+    Nama?: string
+    Name?: string
+    nama?: string
+}
+
+export interface MahasiswaSummary {
+    MhswID?: string | number
+    Nama?: string
+}
+
 export interface ResponseDetail {
     DetailID: number
     ResponID: number
@@ -30,6 +54,8 @@ export interface ResponseDetail {
     response?: ResponseSummary
     question?: QuestionSummary
     choice?: ChoiceSummary
+    mahasiswa?: MahasiswaSummary
+    dosen?: DosenSummary
 }
 
 export interface ResponseDetailListResponse {

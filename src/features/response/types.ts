@@ -6,6 +6,23 @@ export interface Response {
     TahunAkademik: string
     Semester: string
     CreatedAt: string
+    dosen?: DosenSummary | DosenSummary[] | string
+    Dosen?: DosenSummary | DosenSummary[] | string
+    DosenNama?: string
+    dosen_nama?: string
+    mahasiswa?: MahasiswaSummary
+}
+
+export interface DosenSummary {
+    Login?: string | number
+    Nama?: string
+    Name?: string
+    nama?: string
+}
+
+export interface MahasiswaSummary {
+    MhswID?: string | number
+    Nama?: string
 }
 
 export interface ResponseListResponse {
