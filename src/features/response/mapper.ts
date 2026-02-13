@@ -41,6 +41,7 @@ export function mapResponseToView(item: ResponseApi): ResponseView {
         dosenId,
         dosenNama: buildDosenNama(item),
         matakuliahId: item.MatakuliahID,
+        matakuliahNama: item.matakuliah?.Nama ?? "-",
         tahunAkademik: item.TahunAkademik,
         semester: item.Semester,
         createdAt: item.CreatedAt,

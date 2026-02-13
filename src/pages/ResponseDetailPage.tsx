@@ -138,7 +138,12 @@ export default function ResponseDetailPage() {
                                         {row.dosenNama}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-3">{row.matakuliahId}</TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.matakuliahId}</div>
+                                    <div className="text-xs text-muted-foreground break-words">
+                                        {row.matakuliahNama}
+                                    </div>
+                                </TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>
                                 <TableCell className="max-w-xs truncate py-3">

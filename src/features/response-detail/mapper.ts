@@ -34,6 +34,7 @@ export function mapResponseDetailToView(
         dosenId: item.response?.DosenID ?? "-",
         dosenNama: getNama(item.response?.dosen),
         matakuliahId: item.response?.MatakuliahID ?? "-",
+        matakuliahNama: getNama(item.response?.matakuliah),
         tahunAkademik: item.response?.TahunAkademik ?? "-",
         semester: item.response?.Semester ?? "-",
         pertanyaan: item.question?.AspectText ?? "-",

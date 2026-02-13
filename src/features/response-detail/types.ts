@@ -17,6 +17,12 @@ export interface ResponseSummary {
         Name?: string
         nama?: string
     }
+    matakuliah?: {
+        MKID?: string
+        Nama?: string
+        Name?: string
+        nama?: string
+    }
 }
 
 export interface QuestionSummary {
@@ -44,6 +50,11 @@ export interface MahasiswaSummary {
     Nama?: string
 }
 
+export interface MatakuliahSummary {
+    MKID?: string | number
+    Nama?: string
+}
+
 export interface ResponseDetail {
     DetailID: number
     ResponID: number
@@ -56,6 +67,7 @@ export interface ResponseDetail {
     choice?: ChoiceSummary
     mahasiswa?: MahasiswaSummary
     dosen?: DosenSummary
+    matakuliah?: MatakuliahSummary
 }
 
 export interface ResponseDetailListResponse {

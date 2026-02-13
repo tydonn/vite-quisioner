@@ -11,6 +11,7 @@ export interface Response {
     DosenNama?: string
     dosen_nama?: string
     mahasiswa?: MahasiswaSummary
+    matakuliah?: MatakuliahSummary
 }
 
 export interface DosenSummary {
@@ -22,6 +23,11 @@ export interface DosenSummary {
 
 export interface MahasiswaSummary {
     MhswID?: string | number
+    Nama?: string
+}
+
+export interface MatakuliahSummary {
+    MKID?: string | number
     Nama?: string
 }
 

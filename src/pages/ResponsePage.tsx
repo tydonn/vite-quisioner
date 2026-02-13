@@ -82,7 +82,7 @@ export default function ResponsePage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Respon ID</TableHead>
-                            <TableHead>Mahasiswa ID</TableHead>
+                            {/* <TableHead>Mahasiswa ID</TableHead> */}
                             <TableHead>Dosen</TableHead>
                             <TableHead>Matakuliah ID</TableHead>
                             <TableHead>Tahun Akademik</TableHead>
@@ -109,7 +109,12 @@ export default function ResponsePage() {
                                         {row.dosenNama}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-3">{row.matakuliahId}</TableCell>
+                                <TableCell className="py-3">
+                                    <div>{row.matakuliahId}</div>
+                                    <div className="text-xs text-muted-foreground break-words">
+                                        {row.matakuliahNama}
+                                    </div>
+                                </TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>
                                 <TableCell className="py-3">{row.createdAt}</TableCell>
