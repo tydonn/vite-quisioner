@@ -82,7 +82,7 @@ export default function ResponsePage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>Respon ID</TableHead>
-                            {/* <TableHead>Mahasiswa ID</TableHead> */}
+                            <TableHead>Mahasiswa ID</TableHead>
                             <TableHead>Dosen</TableHead>
                             <TableHead>Matakuliah ID</TableHead>
                             <TableHead>Tahun Akademik</TableHead>
