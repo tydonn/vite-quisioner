@@ -153,14 +153,14 @@ export default function ResponseDetailPage() {
                                     {row.jawabanTampil === row.jawabanLabel &&
                                         row.jawabanLabel !== "-" ? (
                                         <span
-                                            className={`inline-flex max-w-sm items-center whitespace-normal break-words rounded-md px-2 py-1 text-xs font-medium ${getJawabanClassName(
+                                            className={`inline-flex max-w-sm items-center text-center whitespace-normal break-words rounded-md px-2 py-1 text-xs font-medium ${getJawabanClassName(
                                                 row.jawabanTampil
                                             )}`}
                                         >
                                             {row.jawabanTampil}
                                         </span>
                                     ) : (
-                                        <span className="max-w-sm text-sm text-foreground whitespace-normal break-words">
+                                        <span className="max-w-sm text-xs text-foreground whitespace-normal break-words">
                                             {row.jawabanTampil}
                                         </span>
                                     )}
