@@ -126,13 +126,13 @@ export default function ResponseDetailPage() {
                                 <TableCell className="font-medium py-3">
                                     {row.responId}
                                 </TableCell>
-                                <TableCell className="py-3">
+                                <TableCell className="max-w-40 whitespace-normal py-3">
                                     <div>{row.mahasiswaId}</div>
                                     <div className="text-xs text-muted-foreground break-words">
                                         {row.mahasiswaNama}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-3">
+                                <TableCell className="max-w-40 whitespace-normal py-3">
                                     <div>{row.dosenId}</div>
                                     <div className="text-xs text-muted-foreground break-words">
                                         {row.dosenNama}
@@ -140,7 +140,7 @@ export default function ResponseDetailPage() {
                                 </TableCell>
                                 <TableCell className="py-3 max-w-40 whitespace-normal">
                                     <div>{row.matakuliahId}</div>
-                                    <div className="text-xs text-muted-foreground truncate py-3">
+                                    <div className="text-xs text-muted-foreground break-words">
                                         {row.matakuliahNama}
                                     </div>
                                 </TableCell>
@@ -160,7 +160,7 @@ export default function ResponseDetailPage() {
                                             {row.jawabanTampil}
                                         </span>
                                     ) : (
-                                        <span className="max-w-sm text-xs text-foreground whitespace-normal break-words">
+                                        <span className="max-w-sm text-xs text-muted-foreground whitespace-normal break-words">
                                             {row.jawabanTampil}
                                         </span>
                                     )}
