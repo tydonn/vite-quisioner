@@ -116,7 +116,7 @@ export default function ResponseDetailPage() {
                             <TableHead>Tahun Akademik</TableHead>
                             <TableHead>Semester</TableHead>
                             <TableHead>Pertanyaan</TableHead>
-                            <TableHead>Jawaban</TableHead>
+                            <TableHead className="shrink-0">Jawaban</TableHead>
                         </TableRow>
                     </TableHeader>
 
@@ -138,18 +138,18 @@ export default function ResponseDetailPage() {
                                         {row.dosenNama}
                                     </div>
                                 </TableCell>
-                                <TableCell className="py-3">
+                                <TableCell className="py-3 max-w-40 whitespace-normal">
                                     <div>{row.matakuliahId}</div>
-                                    <div className="text-xs text-muted-foreground break-words">
+                                    <div className="text-xs text-muted-foreground truncate py-3">
                                         {row.matakuliahNama}
                                     </div>
                                 </TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>
-                                <TableCell className="max-w-xs truncate py-3">
+                                <TableCell className="max-w-64 truncate py-3">
                                     {row.pertanyaan}
                                 </TableCell>
-                                <TableCell className="max-w-sm py-3 whitespace-normal break-words">
+                                <TableCell className="max-w-40 py-3 whitespace-normal break-words shrink-0">
                                     {row.jawabanTampil === row.jawabanLabel &&
                                         row.jawabanLabel !== "-" ? (
                                         <span
@@ -160,7 +160,7 @@ export default function ResponseDetailPage() {
                                             {row.jawabanTampil}
                                         </span>
                                     ) : (
-                                        <span className="text-sm text-foreground whitespace-normal break-words">
+                                        <span className="max-w-sm text-sm text-foreground whitespace-normal break-words">
                                             {row.jawabanTampil}
                                         </span>
                                     )}
@@ -173,7 +173,7 @@ export default function ResponseDetailPage() {
 
             <div className="flex flex-col gap-3 rounded-lg border bg-background p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Per halaman</span>
+                    <span>Per Halaman</span>
                     <select
                         className="rounded border px-2 py-1"
                         value={perPage}
@@ -200,7 +200,7 @@ export default function ResponseDetailPage() {
                         <ChevronLeftIcon className="size-4" />
                     </Button>
                     <div className="text-sm text-muted-foreground">
-                        Page {page} of {lastPage}
+                        {page} of {lastPage}
                     </div>
                     <Button
                         size="sm"

@@ -111,7 +111,7 @@ export default function ResponsePage() {
                                 </TableCell>
                                 <TableCell className="py-3">
                                     <div>{row.matakuliahId}</div>
-                                    <div className="text-xs text-muted-foreground break-words">
+                                    <div className="text-xs text-muted-foreground truncate py-1">
                                         {row.matakuliahNama}
                                     </div>
                                 </TableCell>
