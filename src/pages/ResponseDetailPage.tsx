@@ -40,14 +40,26 @@ function getJawabanClassName(value: string) {
     return "bg-muted text-foreground"
 }
 
+function toCsvValue(value: string | number | null | undefined): string {
+    if (value === null || value === undefined) return ""
+    const str = String(value)
+    const escaped = str.replace(/"/g, '""')
+    return `"${escaped}"`
+}
+
 export default function ResponseDetailPage() {
     const [data, setData] = useState<ResponseDetailView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [tahunAkademikInput, setTahunAkademikInput] = useState("")
+    const [prodiInput, setProdiInput] = useState("")
+    const [tahunAkademikFilter, setTahunAkademikFilter] = useState("")
+    const [prodiFilter, setProdiFilter] = useState("")
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
     const [lastPage, setLastPage] = useState(1)
     const [total, setTotal] = useState(0)
+    const [isDownloading, setIsDownloading] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
@@ -57,6 +69,8 @@ export default function ResponseDetailPage() {
                     params: {
                         page,
                         per_page: perPage,
+                        tahun_akademik: tahunAkademikFilter || undefined,
+                        nama_prodi: prodiFilter || undefined,
                     },
                 })
                 setData(mapResponseDetailListToView(res.data.data))
@@ -70,7 +84,7 @@ export default function ResponseDetailPage() {
         }
 
         fetchData()
-    }, [page, perPage])
+    }, [page, perPage, tahunAkademikFilter, prodiFilter])
 
     if (loading) {
         return <div>Loading...</div>
@@ -85,6 +99,8 @@ export default function ResponseDetailPage() {
             item.dosenId.toLowerCase().includes(q) ||
             item.dosenNama.toLowerCase().includes(q) ||
             item.matakuliahId.toLowerCase().includes(q) ||
+            item.matakuliahNama.toLowerCase().includes(q) ||
+            item.prodiNama.toLowerCase().includes(q) ||
             item.tahunAkademik.toLowerCase().includes(q) ||
             item.semester.toLowerCase().includes(q) ||
             item.pertanyaan.toLowerCase().includes(q) ||
@@ -98,12 +114,127 @@ export default function ResponseDetailPage() {
                 <h1 className="text-xl font-semibold">Response Detail</h1>
             </div>
 
-            <Input
-                placeholder="Cari response detail..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm shadow-sm"
-            />
+            <div className="flex flex-wrap items-center gap-3">
+                {/* <Input
+                    placeholder="Cari response detail..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="max-w-sm shadow-sm"
+                /> */}
+                <Input
+                    placeholder="Filter Tahun Akademik..."
+                    value={tahunAkademikInput}
+                    onChange={(e) => setTahunAkademikInput(e.target.value)}
+                    className="max-w-sm shadow-sm"
+                />
+                <Input
+                    placeholder="Filter Prodi..."
+                    value={prodiInput}
+                    onChange={(e) => setProdiInput(e.target.value)}
+                    className="max-w-sm shadow-sm"
+                />
+                <div className="ml-auto flex items-center gap-3">
+                    <Button
+                        onClick={() => {
+                            setTahunAkademikFilter(tahunAkademikInput)
+                            setProdiFilter(prodiInput)
+                            setPage(1)
+                        }}
+                    >
+                        Filter
+                    </Button>
+                    <Button
+                        variant="outline"
+                        disabled={isDownloading}
+                        onClick={async () => {
+                            if (!filtered.length) return
+                            const ok = window.confirm(
+                                "Download data hasil filter ke Excel?"
+                            )
+                            if (!ok) return
+
+                            setIsDownloading(true)
+                            try {
+                                const headers = [
+                                    "Respon ID",
+                                    "Mahasiswa ID",
+                                    "Nama Mahasiswa",
+                                    "Dosen ID",
+                                    "Nama Dosen",
+                                    "Matakuliah ID",
+                                    "Nama Matakuliah",
+                                    "Prodi",
+                                    "Tahun Akademik",
+                                    "Semester",
+                                    "Pertanyaan",
+                                    "Jawaban",
+                                ]
+
+                                const allRows: ResponseDetailView[] = []
+                                let exportPage = 1
+                                let exportLastPage = 1
+                                const exportPerPage = 500
+
+                                do {
+                                    const res = await api.get<ResponseDetailListResponse>(
+                                        "/response-details",
+                                        {
+                                            params: {
+                                                page: exportPage,
+                                                per_page: exportPerPage,
+                                                tahun_akademik: tahunAkademikFilter || undefined,
+                                                nama_prodi: prodiFilter || undefined,
+                                            },
+                                        }
+                                    )
+
+                                    allRows.push(...mapResponseDetailListToView(res.data.data))
+                                    exportLastPage = res.data.pagination.last_page
+                                    exportPage += 1
+                                } while (exportPage <= exportLastPage)
+
+                                const rows = allRows.map((row) => [
+                                    row.responId,
+                                    row.mahasiswaId,
+                                    row.mahasiswaNama,
+                                    row.dosenId,
+                                    row.dosenNama,
+                                    row.matakuliahId,
+                                    row.matakuliahNama,
+                                    row.prodiNama,
+                                    row.tahunAkademik,
+                                    row.semester,
+                                    row.pertanyaan,
+                                    row.jawabanTampil,
+                                ])
+
+                                const csv = [
+                                    headers.map(toCsvValue).join(","),
+                                    ...rows.map((row) => row.map(toCsvValue).join(",")),
+                                ].join("\n")
+
+                                const blob = new Blob([csv], {
+                                    type: "text/csv;charset=utf-8;",
+                                })
+                                const url = URL.createObjectURL(blob)
+                                const link = document.createElement("a")
+                                const timestamp = new Date()
+                                    .toISOString()
+                                    .slice(0, 19)
+                                    .replace(/[:T]/g, "-")
+                                link.href = url
+                                link.download = `response-detail-${timestamp}.csv`
+                                link.click()
+                                URL.revokeObjectURL(url)
+                            } finally {
+                                setIsDownloading(false)
+                            }
+                        }}
+                    >
+                        {isDownloading ? "Mendownload..." : "Download Excel"}
+                    </Button>
+                </div>
+            </div>
 
             <div className="border rounded-lg shadow-sm">
                 <Table>
@@ -113,6 +244,7 @@ export default function ResponseDetailPage() {
                             <TableHead>Mahasiswa ID</TableHead>
                             <TableHead>Dosen ID</TableHead>
                             <TableHead>Matakuliah ID</TableHead>
+                            <TableHead>Prodi</TableHead>
                             <TableHead>Tahun Akademik</TableHead>
                             <TableHead>Semester</TableHead>
                             <TableHead>Pertanyaan</TableHead>
@@ -143,6 +275,9 @@ export default function ResponseDetailPage() {
                                     <div className="text-xs text-muted-foreground break-words">
                                         {row.matakuliahNama}
                                     </div>
+                                </TableCell>
+                                <TableCell className="py-3 max-w-40 whitespace-normal break-words">
+                                    {row.prodiNama}
                                 </TableCell>
                                 <TableCell className="py-3">{row.tahunAkademik}</TableCell>
                                 <TableCell className="py-3">{row.semester}</TableCell>

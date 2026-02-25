@@ -7,6 +7,7 @@ export interface ResponseDetailView {
     dosenNama: string
     matakuliahId: string
     matakuliahNama: string
+    prodiNama: string
     tahunAkademik: string
     semester: string
     pertanyaan: string

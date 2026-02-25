@@ -22,6 +22,13 @@ export interface ResponseSummary {
         Nama?: string
         Name?: string
         nama?: string
+        ProdiID?: string | number
+        prodi?: {
+            ProdiID?: string | number
+            Nama?: string
+            Name?: string
+            nama?: string
+        }
     }
 }
 
