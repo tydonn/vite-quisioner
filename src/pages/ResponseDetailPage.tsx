@@ -128,6 +128,7 @@ export default function ResponseDetailPage() {
                                     params: {
                                         tahun_akademik: tahunAkademikFilter || undefined,
                                         nama_prodi: prodiFilter || undefined,
+                                        chunk_size: 5000,
                                     },
                                     responseType: "blob",
                                 })
