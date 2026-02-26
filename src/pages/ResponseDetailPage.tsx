@@ -50,7 +50,6 @@ function toCsvValue(value: string | number | null | undefined): string {
 export default function ResponseDetailPage() {
     const [data, setData] = useState<ResponseDetailView[]>([])
     const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState("")
     const [tahunAkademikInput, setTahunAkademikInput] = useState("")
     const [prodiInput, setProdiInput] = useState("")
     const [tahunAkademikFilter, setTahunAkademikFilter] = useState("")
@@ -90,23 +89,7 @@ export default function ResponseDetailPage() {
         return <div>Loading...</div>
     }
 
-    const filtered = data.filter((item) => {
-        const q = search.toLowerCase()
-        return (
-            item.responId.toString().includes(q) ||
-            item.mahasiswaId.toLowerCase().includes(q) ||
-            item.mahasiswaNama.toLowerCase().includes(q) ||
-            item.dosenId.toLowerCase().includes(q) ||
-            item.dosenNama.toLowerCase().includes(q) ||
-            item.matakuliahId.toLowerCase().includes(q) ||
-            item.matakuliahNama.toLowerCase().includes(q) ||
-            item.prodiNama.toLowerCase().includes(q) ||
-            item.tahunAkademik.toLowerCase().includes(q) ||
-            item.semester.toLowerCase().includes(q) ||
-            item.pertanyaan.toLowerCase().includes(q) ||
-            item.jawabanTampil.toLowerCase().includes(q)
-        )
-    })
+    const filtered = data
 
     return (
         <div className="space-y-4">
@@ -115,12 +98,6 @@ export default function ResponseDetailPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                {/* <Input
-                    placeholder="Cari response detail..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="max-w-sm shadow-sm"
-                /> */}
                 <Input
                     placeholder="Filter Tahun Akademik..."
                     value={tahunAkademikInput}
