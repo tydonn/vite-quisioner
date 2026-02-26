@@ -40,13 +40,6 @@ function getJawabanClassName(value: string) {
     return "bg-muted text-foreground"
 }
 
-function toCsvValue(value: string | number | null | undefined): string {
-    if (value === null || value === undefined) return ""
-    const str = String(value)
-    const escaped = str.replace(/"/g, '""')
-    return `"${escaped}"`
-}
-
 export default function ResponseDetailPage() {
     const [data, setData] = useState<ResponseDetailView[]>([])
     const [loading, setLoading] = useState(true)
@@ -124,7 +117,6 @@ export default function ResponseDetailPage() {
                         variant="outline"
                         disabled={isDownloading}
                         onClick={async () => {
-                            if (!filtered.length) return
                             const ok = window.confirm(
                                 "Download data hasil filter ke Excel?"
                             )
@@ -132,67 +124,19 @@ export default function ResponseDetailPage() {
 
                             setIsDownloading(true)
                             try {
-                                const headers = [
-                                    "Respon ID",
-                                    "Mahasiswa ID",
-                                    "Nama Mahasiswa",
-                                    "Dosen ID",
-                                    "Nama Dosen",
-                                    "Matakuliah ID",
-                                    "Nama Matakuliah",
-                                    "Prodi",
-                                    "Tahun Akademik",
-                                    "Semester",
-                                    "Pertanyaan",
-                                    "Jawaban",
-                                ]
-
-                                const allRows: ResponseDetailView[] = []
-                                let exportPage = 1
-                                let exportLastPage = 1
-                                const exportPerPage = 500
-
-                                do {
-                                    const res = await api.get<ResponseDetailListResponse>(
-                                        "/response-details",
-                                        {
-                                            params: {
-                                                page: exportPage,
-                                                per_page: exportPerPage,
-                                                tahun_akademik: tahunAkademikFilter || undefined,
-                                                nama_prodi: prodiFilter || undefined,
-                                            },
-                                        }
-                                    )
-
-                                    allRows.push(...mapResponseDetailListToView(res.data.data))
-                                    exportLastPage = res.data.pagination.last_page
-                                    exportPage += 1
-                                } while (exportPage <= exportLastPage)
-
-                                const rows = allRows.map((row) => [
-                                    row.responId,
-                                    row.mahasiswaId,
-                                    row.mahasiswaNama,
-                                    row.dosenId,
-                                    row.dosenNama,
-                                    row.matakuliahId,
-                                    row.matakuliahNama,
-                                    row.prodiNama,
-                                    row.tahunAkademik,
-                                    row.semester,
-                                    row.pertanyaan,
-                                    row.jawabanTampil,
-                                ])
-
-                                const csv = [
-                                    headers.map(toCsvValue).join(","),
-                                    ...rows.map((row) => row.map(toCsvValue).join(",")),
-                                ].join("\n")
-
-                                const blob = new Blob([csv], {
-                                    type: "text/csv;charset=utf-8;",
+                                const res = await api.get("/response-details/download", {
+                                    params: {
+                                        tahun_akademik: tahunAkademikFilter || undefined,
+                                        nama_prodi: prodiFilter || undefined,
+                                    },
+                                    responseType: "blob",
                                 })
+
+                                const contentType =
+                                    (res.headers?.["content-type"] as string | undefined) ??
+                                    "application/octet-stream"
+                                const extension = contentType.includes("csv") ? "csv" : "xlsx"
+                                const blob = new Blob([res.data], { type: contentType })
                                 const url = URL.createObjectURL(blob)
                                 const link = document.createElement("a")
                                 const timestamp = new Date()
@@ -200,7 +144,7 @@ export default function ResponseDetailPage() {
                                     .slice(0, 19)
                                     .replace(/[:T]/g, "-")
                                 link.href = url
-                                link.download = `response-detail-${timestamp}.csv`
+                                link.download = `response-detail-${timestamp}.${extension}`
                                 link.click()
                                 URL.revokeObjectURL(url)
                             } finally {
