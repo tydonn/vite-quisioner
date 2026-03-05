@@ -425,8 +425,25 @@ export default function ResponsePage() {
                                     .toISOString()
                                     .slice(0, 19)
                                     .replace(/[:T]/g, "-")
+                                const safe = (value?: string) =>
+                                    (value ?? "")
+                                        .toString()
+                                        .trim()
+                                        .replace(/[^a-zA-Z0-9-_]+/g, "-")
+                                        .replace(/-+/g, "-")
+                                        .replace(/^-|-$/g, "")
+                                const prodiSlug = safe(namaProdi)
+                                const mkSlug = safe(namaMatakuliah)
+                                const tahunSlug = safe(tahunAkademikInput)
+                                const nameParts = [
+                                    "response-detail",
+                                    tahunSlug && `tahun-${tahunSlug}`,
+                                    prodiSlug && `prodi-${prodiSlug}`,
+                                    mkSlug && `mk-${mkSlug}`,
+                                ].filter(Boolean) as string[]
+                                const baseName = nameParts.join("_")
                                 link.href = url
-                                link.download = `response-detail-${timestamp}.xlsx`
+                                link.download = `${baseName || "response-detail"}_${timestamp}.xlsx`
                                 link.click()
                                 URL.revokeObjectURL(url)
                             } catch (err) {
