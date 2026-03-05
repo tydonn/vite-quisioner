@@ -28,6 +28,23 @@ export interface MahasiswaSummary {
 
 export interface MatakuliahSummary {
     MKID?: string | number
+    MKKode?: string
+    Nama?: string
+    ProdiID?: string | number
+    prodi?: {
+        ProdiID?: string | number
+        Nama?: string
+    }
+}
+
+export interface ResponseFilterProdiOption {
+    ProdiID?: string | number
+    Nama?: string
+}
+
+export interface ResponseFilterMatakuliahOption {
+    MKID?: string | number
+    MKKode?: string
     Nama?: string
 }
 

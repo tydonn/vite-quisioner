@@ -12,7 +12,15 @@ import {
 
 export function AppBreadcrumbs() {
     const location = useLocation()
-    const segments = location.pathname.split("/").filter(Boolean)
+    const segments = location.pathname
+        .split("/")
+        .filter(Boolean)
+        .filter((seg) => seg !== "responden")
+
+    const labelMap: Record<string, string> = {
+        response: "Response",
+        detail: "Response Detail",
+    }
 
     return (
         <Breadcrumb>
@@ -24,8 +32,9 @@ export function AppBreadcrumbs() {
                 </BreadcrumbItem>
 
                 {segments.map((seg, i) => {
-                    const href = "/dashboard" + segments.slice(0, i + 1).join("/")
-                    const label = seg.replace("-", " ")
+                    const href = "/" + segments.slice(0, i + 1).join("/")
+                    const label =
+                        labelMap[seg] ?? seg.replace("-", " ")
 
                     return (
                         <React.Fragment key={href}>

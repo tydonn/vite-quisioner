@@ -21,6 +21,7 @@ import { mapAspectListToView } from "@/features/question/mapper"
 import api from "@/lib/api" // axios instance
 
 import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
+import SpinnerPage from "@/pages/SpinnerPage"
 
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
@@ -43,13 +44,18 @@ export default function BankPertanyaanPage() {
                     params: {
                         page,
                         per_page: perPage,
+                        include_total: true,
                     },
                 })
 
                 const mapped = mapAspectListToView(res.data.data)
                 setData(mapped)
-                setLastPage(res.data.pagination.last_page)
-                setTotal(res.data.pagination.total)
+                if (res.data.pagination.last_page !== null) {
+                    setLastPage(res.data.pagination.last_page)
+                }
+                if (res.data.pagination.total !== null) {
+                    setTotal(res.data.pagination.total)
+                }
             } catch (error) {
                 console.error("Gagal mengambil data pertanyaan", error)
             } finally {
@@ -66,7 +72,7 @@ export default function BankPertanyaanPage() {
             d.kategori.toLowerCase().includes(search.toLowerCase())
     )
     if (loading) {
-        return <div>Loading...</div>
+        return <SpinnerPage />
     }
 
     return (
@@ -192,17 +198,22 @@ export default function BankPertanyaanPage() {
                     data={selected}
                     onClose={() => setSelected(null)}
                     onSuccess={async () => {
-                        const res = await api.get<AspectListResponse>("/questions", {
-                            params: {
-                                page,
-                                per_page: perPage,
-                            },
-                        })
-                        setData(mapAspectListToView(res.data.data))
+                    const res = await api.get<AspectListResponse>("/questions", {
+                        params: {
+                            page,
+                            per_page: perPage,
+                            include_total: true,
+                        },
+                    })
+                    setData(mapAspectListToView(res.data.data))
+                    if (res.data.pagination.last_page !== null) {
                         setLastPage(res.data.pagination.last_page)
+                    }
+                    if (res.data.pagination.total !== null) {
                         setTotal(res.data.pagination.total)
-                    }}
-                />
+                    }
+                }}
+            />
             </div>
         </div>
     )

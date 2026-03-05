@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
+import { Spinner } from "@/components/ui/spinner"
 import {
     InputGroup,
     InputGroupAddon,
@@ -96,7 +97,14 @@ export default function LoginForm() {
 
             {/* Action */}
             <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Memproses..." : "Masuk"}
+                {loading ? (
+                    <span className="inline-flex items-center gap-2">
+                        <Spinner className="size-4" />
+                        Memproses...
+                    </span>
+                ) : (
+                    "Masuk"
+                )}
             </Button>
         </form>
     )

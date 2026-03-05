@@ -26,6 +26,7 @@ import type { ChoiceView } from "@/features/choice/view-types"
 import { mapChoiceListToView } from "@/features/choice/mapper"
 import { EditChoiceDialog } from "@/features/choice/components/EditChoiceDialog"
 import api from "@/lib/api"
+import SpinnerPage from "@/pages/SpinnerPage"
 
 function getLabelClassName(value: string) {
     const normalized = value.toLowerCase()
@@ -65,11 +66,16 @@ export default function PilihanPage() {
                     params: {
                         page,
                         per_page: perPage,
+                        include_total: true,
                     },
                 })
                 setData(mapChoiceListToView(res.data.data))
-                setLastPage(res.data.pagination.last_page)
-                setTotal(res.data.pagination.total)
+                if (res.data.pagination.last_page !== null) {
+                    setLastPage(res.data.pagination.last_page)
+                }
+                if (res.data.pagination.total !== null) {
+                    setTotal(res.data.pagination.total)
+                }
             } catch (error) {
                 console.error("Gagal mengambil data pilihan", error)
             } finally {
@@ -88,7 +94,7 @@ export default function PilihanPage() {
     )
 
     if (loading) {
-        return <div>Loading...</div>
+        return <SpinnerPage />
     }
 
     return (
@@ -233,11 +239,16 @@ export default function PilihanPage() {
                         params: {
                             page,
                             per_page: perPage,
+                            include_total: true,
                         },
                     })
                     setData(mapChoiceListToView(res.data.data))
-                    setLastPage(res.data.pagination.last_page)
-                    setTotal(res.data.pagination.total)
+                    if (res.data.pagination.last_page !== null) {
+                        setLastPage(res.data.pagination.last_page)
+                    }
+                    if (res.data.pagination.total !== null) {
+                        setTotal(res.data.pagination.total)
+                    }
                 }}
             />
         </div>

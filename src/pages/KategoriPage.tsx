@@ -27,6 +27,7 @@ import { mapCategoryListToView } from "@/features/category/mapper"
 import { EditCategoryDialog } from "@/features/category/components/EditCategoryDialog"
 
 import api from "@/lib/api"
+import SpinnerPage from "@/pages/SpinnerPage"
 
 export default function KategoriPage() {
     const [data, setData] = useState<KategoriView[]>([])
@@ -45,12 +46,17 @@ export default function KategoriPage() {
                     params: {
                         page,
                         per_page: perPage,
+                        include_total: true,
                     },
                 })
                 const mapped = mapCategoryListToView(res.data.data)
                 setData(mapped)
-                setLastPage(res.data.pagination.last_page)
-                setTotal(res.data.pagination.total)
+                if (res.data.pagination.last_page !== null) {
+                    setLastPage(res.data.pagination.last_page)
+                }
+                if (res.data.pagination.total !== null) {
+                    setTotal(res.data.pagination.total)
+                }
             } catch (error) {
                 console.error("Gagal mengambil data kategori", error)
             } finally {
@@ -68,7 +74,7 @@ export default function KategoriPage() {
     )
 
     if (loading) {
-        return <div>Loading...</div>
+        return <SpinnerPage />
     }
 
     return (
@@ -210,11 +216,16 @@ export default function KategoriPage() {
                         params: {
                             page,
                             per_page: perPage,
+                            include_total: true,
                         },
                     })
                     setData(mapCategoryListToView(res.data.data))
-                    setLastPage(res.data.pagination.last_page)
-                    setTotal(res.data.pagination.total)
+                    if (res.data.pagination.last_page !== null) {
+                        setLastPage(res.data.pagination.last_page)
+                    }
+                    if (res.data.pagination.total !== null) {
+                        setTotal(res.data.pagination.total)
+                    }
                 }}
             />
         </div>

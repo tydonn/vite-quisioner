@@ -33,6 +33,14 @@ function buildDosenNama(item: ResponseApi): string {
 
 export function mapResponseToView(item: ResponseApi): ResponseView {
     const dosenId = String(item.DosenID)
+    const prodiId =
+        item.matakuliah?.prodi?.ProdiID !== undefined &&
+        item.matakuliah?.prodi?.ProdiID !== null
+            ? String(item.matakuliah.prodi.ProdiID)
+            : item.matakuliah?.ProdiID !== undefined &&
+              item.matakuliah?.ProdiID !== null
+            ? String(item.matakuliah.ProdiID)
+            : "-"
 
     return {
         id: item.ResponID,
@@ -41,7 +49,10 @@ export function mapResponseToView(item: ResponseApi): ResponseView {
         dosenId,
         dosenNama: buildDosenNama(item),
         matakuliahId: item.MatakuliahID,
+        matakuliahKode: item.matakuliah?.MKKode ?? "-",
         matakuliahNama: item.matakuliah?.Nama ?? "-",
+        prodiId,
+        prodiNama: item.matakuliah?.prodi?.Nama ?? "-",
         tahunAkademik: item.TahunAkademik,
         semester: item.Semester,
         createdAt: item.CreatedAt,
