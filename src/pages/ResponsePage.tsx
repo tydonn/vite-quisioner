@@ -239,6 +239,7 @@ export default function ResponsePage() {
                             setIsProdiOpen((prev) => !prev)
                             setIsMatakuliahOpen(false)
                         }}
+                        title={selectedProdiLabel}
                     >
                         {selectedProdiLabel}
                     </Button>
@@ -307,6 +308,7 @@ export default function ResponsePage() {
                             setIsMatakuliahOpen((prev) => !prev)
                             setIsProdiOpen(false)
                         }}
+                        title={selectedMatakuliahLabel}
                     >
                         {selectedMatakuliahLabel}
                     </Button>
