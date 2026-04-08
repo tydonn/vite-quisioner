@@ -16,21 +16,15 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart"
+import api from "@/lib/api"
 
-const chartData = [
-    { month: "January", sangatpuas: 186, puas: 80, netral: 40, tidakpuas: 20, sangattidakpuas: 10 },
-    { month: "February", sangatpuas: 305, puas: 200, netral: 120, tidakpuas: 100, sangattidakpuas: 80 },
-    { month: "March", sangatpuas: 237, puas: 120, netral: 90, tidakpuas: 50, sangattidakpuas: 30 },
-    { month: "April", sangatpuas: 73, puas: 190, netral: 70, tidakpuas: 40, sangattidakpuas: 20 },
-    { month: "May", sangatpuas: 209, puas: 130, netral: 90, tidakpuas: 50, sangattidakpuas: 30 },
-    { month: "June", sangatpuas: 214, puas: 140, netral: 100, tidakpuas: 60, sangattidakpuas: 40 },
-    { month: "July", sangatpuas: 218, puas: 150, netral: 110, tidakpuas: 70, sangattidakpuas: 50 },
-    { month: "August", sangatpuas: 250, puas: 160, netral: 120, tidakpuas: 80, sangattidakpuas: 60 },
-    { month: "September", sangatpuas: 300, puas: 170, netral: 130, tidakpuas: 90, sangattidakpuas: 70 },
-    { month: "October", sangatpuas: 320, puas: 180, netral: 140, tidakpuas: 100, sangattidakpuas: 80 },
-    { month: "November", sangatpuas: 340, puas: 190, netral: 150, tidakpuas: 110, sangattidakpuas: 90 },
-    { month: "December", sangatpuas: 360, puas: 200, netral: 160, tidakpuas: 120, sangattidakpuas: 100 },
-]
+type ChartDatum = {
+    label: string
+    sangatpuas: number
+    puas: number
+    kurangpuas: number
+    tidakpuas: number
+}
 
 const chartConfig = {
     sangatpuas: {
@@ -41,17 +35,13 @@ const chartConfig = {
         label: "Puas",
         color: "var(--chart-2)",
     },
-    netral: {
-        label: "Netral",
+    kurangpuas: {
+        label: "Kurang Puas",
         color: "var(--chart-3)",
     },
     tidakpuas: {
         label: "Tidak Puas",
         color: "var(--chart-4)",
-    },
-    sangattidakpuas: {
-        label: "Sangat Tidak Puas",
-        color: "var(--chart-5)",
     },
 } satisfies ChartConfig
 
@@ -60,6 +50,72 @@ type ChartKey = keyof typeof chartConfig
 export function ChartLineInteractive() {
     const [activeChart, setActiveChart] =
         React.useState<ChartKey>("sangatpuas")
+    const [chartData, setChartData] = React.useState<ChartDatum[]>([])
+
+    React.useEffect(() => {
+        const controller = new AbortController()
+        let cancelled = false
+
+        async function fetchChartData() {
+            try {
+                const res = await api.get<{
+                    success?: boolean
+                    data?: Record<string, number>
+                }>("/response-details/label-counts", {
+                    signal: controller.signal,
+                })
+
+                if (cancelled) return
+
+                const data = res.data?.data ?? {}
+                const normalize = (label: string) => label.toLowerCase().trim()
+
+                const sangatpuas = data["Sangat Puas"] ?? data["SANGAT PUAS"] ?? 0
+                const puas = data["Puas"] ?? data["PUAS"] ?? 0
+                const kurangpuas =
+                    data["Kurang Puas"] ?? data["KURANG PUAS"] ?? 0
+                const tidakpuas = data["Tidak Puas"] ?? data["TIDAK PUAS"] ?? 0
+
+                const mapped = Object.entries(data).reduce(
+                    (acc, [label, value]) => {
+                        const key = normalize(label)
+                        if (key === "sangat puas") acc.sangatpuas = value
+                        if (key === "puas") acc.puas = value
+                        if (key === "kurang puas") acc.kurangpuas = value
+                        if (key === "tidak puas") acc.tidakpuas = value
+                        return acc
+                    },
+                    {
+                        sangatpuas,
+                        puas,
+                        kurangpuas,
+                        tidakpuas,
+                    }
+                )
+
+                setChartData([
+                    {
+                        label: "Total",
+                        ...mapped,
+                    },
+                ])
+            } catch (error) {
+                const err = error as { name?: string; code?: string }
+                if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") {
+                    return
+                }
+                console.error("Gagal mengambil data chart", error)
+                setChartData([])
+            }
+        }
+
+        fetchChartData()
+
+        return () => {
+            cancelled = true
+            controller.abort()
+        }
+    }, [])
 
     const total = React.useMemo(() => {
         return Object.keys(chartConfig).reduce((acc, key) => {
@@ -77,7 +133,7 @@ export function ChartLineInteractive() {
                 <div className="flex flex-1 flex-col justify-center gap-1 px-6 pb-3 sm:pb-0">
                     <CardTitle>Tren Kepuasan Responden</CardTitle>
                     <CardDescription>
-                        Rekap kuisioner per bulan
+                        Rekap kuisioner total
                     </CardDescription>
                 </div>
 
@@ -107,7 +163,7 @@ export function ChartLineInteractive() {
                 >
                     <LineChart data={chartData}>
                         <CartesianGrid vertical={false} />
-                        <XAxis dataKey="month" />
+                        <XAxis dataKey="label" />
 
                         <ChartTooltip
                             content={<ChartTooltipContent />}

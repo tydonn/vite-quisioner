@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 
 import type {
-    ResponseFilterMatakuliahOption,
     ResponseFilterProdiOption,
     ResponseListResponse,
 } from "@/features/response/types"
@@ -29,12 +28,6 @@ type ProdiOption = {
     nama: string
 }
 
-type MatakuliahOption = {
-    id: string
-    kode: string
-    nama: string
-}
-
 function normalizeProdiOption(item: ResponseFilterProdiOption): ProdiOption | null {
     const rawId = item.ProdiID
     const rawNama = item.Nama
@@ -46,33 +39,14 @@ function normalizeProdiOption(item: ResponseFilterProdiOption): ProdiOption | nu
     }
 }
 
-function normalizeMatakuliahOption(
-    item: ResponseFilterMatakuliahOption
-): MatakuliahOption | null {
-    const rawId = item.MKID
-    const rawKode = item.MKKode
-    const rawNama = item.Nama
-    if (!rawId || !rawNama) return null
-
-    return {
-        id: String(rawId),
-        kode: rawKode ? String(rawKode) : "-",
-        nama: String(rawNama),
-    }
-}
-
 export default function ResponsePage() {
     const [data, setData] = useState<ResponseView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
-    const [matakuliahInput, setMatakuliahInput] = useState("")
     const [prodiInput, setProdiInput] = useState("")
-    const [matakuliahQuery, setMatakuliahQuery] = useState("")
     const [prodiQuery, setProdiQuery] = useState("")
-    const [matakuliahSearch, setMatakuliahSearch] = useState("")
     const [prodiSearch, setProdiSearch] = useState("")
     const [tahunAkademikInput, setTahunAkademikInput] = useState("")
-    const [matakuliahFilter, setMatakuliahFilter] = useState("")
     const [prodiFilter, setProdiFilter] = useState("")
     const [tahunAkademikFilter, setTahunAkademikFilter] = useState("")
     const [page, setPage] = useState(1)
@@ -80,13 +54,10 @@ export default function ResponsePage() {
     const [lastPage, setLastPage] = useState(1)
     const [total, setTotal] = useState(0)
     const [prodiOptions, setProdiOptions] = useState<ProdiOption[]>([])
-    const [matakuliahOptions, setMatakuliahOptions] = useState<MatakuliahOption[]>([])
-    const [isMatakuliahOpen, setIsMatakuliahOpen] = useState(false)
     const [isProdiOpen, setIsProdiOpen] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
     const [isFiltering, setIsFiltering] = useState(false)
     const [isProdiLoading, setIsProdiLoading] = useState(false)
-    const [isMatakuliahLoading, setIsMatakuliahLoading] = useState(false)
     const [isPaging, setIsPaging] = useState(false)
 
     useEffect(() => {
@@ -97,7 +68,6 @@ export default function ResponsePage() {
                     params: {
                         page,
                         per_page: perPage,
-                        matakuliah_id: matakuliahFilter || undefined,
                         prodi_id: prodiFilter || undefined,
                         tahun_akademik: tahunAkademikFilter || undefined,
                         include_total: true,
@@ -120,7 +90,7 @@ export default function ResponsePage() {
         }
 
         fetchData()
-    }, [page, perPage, matakuliahFilter, prodiFilter, tahunAkademikFilter])
+    }, [page, perPage, prodiFilter, tahunAkademikFilter])
 
     useEffect(() => {
         if (!loading) {
@@ -156,35 +126,6 @@ export default function ResponsePage() {
         fetchProdiOptions()
     }, [tahunAkademikInput, prodiSearch])
 
-    useEffect(() => {
-        async function fetchMatakuliahOptions() {
-            setIsMatakuliahLoading(true)
-            try {
-                const res = await api.get<{ data?: ResponseFilterMatakuliahOption[] }>(
-                    "/responses/filter-options/matakuliah",
-                    {
-                        params: {
-                            prodi_id: prodiInput || undefined,
-                            tahun_akademik: tahunAkademikInput || undefined,
-                            q: matakuliahQuery || undefined,
-                            limit: 200,
-                        },
-                    }
-                )
-                const options = (res.data.data ?? [])
-                    .map(normalizeMatakuliahOption)
-                    .filter((item): item is MatakuliahOption => item !== null)
-                setMatakuliahOptions(options)
-            } catch (error) {
-                console.error("Gagal mengambil opsi matakuliah", error)
-            } finally {
-                setIsMatakuliahLoading(false)
-            }
-        }
-
-        fetchMatakuliahOptions()
-    }, [prodiInput, tahunAkademikInput, matakuliahSearch])
-
     if (loading) {
         return <SpinnerPage />
     }
@@ -200,21 +141,14 @@ export default function ResponsePage() {
             item.semester.toLowerCase().includes(search.toLowerCase())
     )
 
-    const selectedMatakuliah = matakuliahOptions.find(
-        (item) => item.id === matakuliahInput
-    )
     const selectedProdi = prodiOptions.find((item) => item.id === prodiInput)
-
-    const selectedMatakuliahLabel = selectedMatakuliah
-        ? `${selectedMatakuliah.kode} - ${selectedMatakuliah.nama}`
-        : "All Matakuliah"
 
     const selectedProdiLabel = selectedProdi
         ? `${selectedProdi.id} - ${selectedProdi.nama}`
         : "All Prodi"
 
     const isFilterReady = Boolean(
-        matakuliahInput && prodiInput && tahunAkademikInput
+        prodiInput && tahunAkademikInput
     )
 
     return (
@@ -237,7 +171,6 @@ export default function ResponsePage() {
                         className="h-9 w-full justify-start truncate"
                         onClick={() => {
                             setIsProdiOpen((prev) => !prev)
-                            setIsMatakuliahOpen(false)
                         }}
                         title={selectedProdiLabel}
                     >
@@ -299,75 +232,6 @@ export default function ResponsePage() {
                         </div>
                     )}
                 </div>
-                <div className="relative w-56">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="h-9 w-full justify-start truncate"
-                        onClick={() => {
-                            setIsMatakuliahOpen((prev) => !prev)
-                            setIsProdiOpen(false)
-                        }}
-                        title={selectedMatakuliahLabel}
-                    >
-                        {selectedMatakuliahLabel}
-                    </Button>
-                    {isMatakuliahOpen && (
-                        <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
-                            <div className="flex items-center gap-2">
-                                <Input
-                                    placeholder="Cari Matakuliah..."
-                                    value={matakuliahQuery}
-                                    onChange={(e) => setMatakuliahQuery(e.target.value)}
-                                    className="h-8"
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-8 px-2"
-                                    disabled={isMatakuliahLoading}
-                                    onClick={() => {
-                                        setMatakuliahSearch(matakuliahQuery)
-                                    }}
-                                >
-                                    {isMatakuliahLoading ? (
-                                        <span className="inline-flex items-center gap-2">
-                                            <Spinner className="size-4" />
-                                            Search
-                                        </span>
-                                    ) : (
-                                        "Search"
-                                    )}
-                                </Button>
-                            </div>
-                            <div className="mt-2 max-h-56 overflow-y-auto">
-                                <button
-                                    type="button"
-                                    className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
-                                    onClick={() => {
-                                        setMatakuliahInput("")
-                                        setIsMatakuliahOpen(false)
-                                    }}
-                                >
-                                    All Matakuliah
-                                </button>
-                                {matakuliahOptions.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        type="button"
-                                        className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
-                                        onClick={() => {
-                                            setMatakuliahInput(item.id)
-                                            setIsMatakuliahOpen(false)
-                                        }}
-                                    >
-                                        {item.kode} - {item.nama}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
                 <Input
                     placeholder="Filter Tahun Akademik..."
                     value={tahunAkademikInput}
@@ -379,7 +243,6 @@ export default function ResponsePage() {
                         disabled={!isFilterReady}
                         onClick={() => {
                             setIsFiltering(true)
-                            setMatakuliahFilter(matakuliahInput)
                             setProdiFilter(prodiInput)
                             setTahunAkademikFilter(tahunAkademikInput)
                             setPage(1)
@@ -405,15 +268,12 @@ export default function ResponsePage() {
 
                             setIsDownloading(true)
                             try {
-                                const namaProdi = selectedProdi?.nama
-                                const namaMatakuliah = selectedMatakuliah?.nama
+                                const prodiId = selectedProdi?.id
                                 const res = await api.get("/response-details/download", {
                                     responseType: "blob",
                                     params: {
                                         tahun_akademik: tahunAkademikInput || undefined,
-                                        nama_prodi: namaProdi || undefined,
-                                        nama_matakuliah: namaMatakuliah || undefined,
-                                        matakuliah_id: matakuliahInput || undefined,
+                                        prodi_id: prodiId || undefined,
                                     },
                                 })
 
@@ -434,14 +294,12 @@ export default function ResponsePage() {
                                         .replace(/[^a-zA-Z0-9-_]+/g, "-")
                                         .replace(/-+/g, "-")
                                         .replace(/^-|-$/g, "")
-                                const prodiSlug = safe(namaProdi)
-                                const mkSlug = safe(namaMatakuliah)
+                                const prodiSlug = safe(prodiId)
                                 const tahunSlug = safe(tahunAkademikInput)
                                 const nameParts = [
                                     "response-detail",
                                     tahunSlug && `tahun-${tahunSlug}`,
                                     prodiSlug && `prodi-${prodiSlug}`,
-                                    mkSlug && `mk-${mkSlug}`,
                                 ].filter(Boolean) as string[]
                                 const baseName = nameParts.join("_")
                                 link.href = url

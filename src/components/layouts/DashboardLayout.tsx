@@ -8,11 +8,12 @@ import { AppSidebar } from "@/components/layouts/AppSidebar"
 import { AppBreadcrumbs } from "@/components/AppBreadcrumbs"
 import { LogoutDropdown } from "@/components/login/LogoutDropdown"
 import { useAuth } from "@/contexts/AuthContext"
+import SpinnerForSideBar from "@/pages/SpinnerForSideBar"
 
 export default function DashboardLayout() {
     const { user, loading } = useAuth()
 
-    if (loading) return <div>Loading...</div>
+    if (loading) return <SpinnerForSideBar />
 
     // agar tidak bisa akses dashboard kalau belum login
     if (!user) return <Navigate to="/" replace />
