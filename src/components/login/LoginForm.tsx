@@ -35,8 +35,20 @@ export default function LoginForm() {
                 password,
             })
 
+            // Support JWT response variants from backend:
+            // { access_token }, { token }, or nested under { data: { ... } }
+            const token =
+                res.data?.access_token ??
+                res.data?.token ??
+                res.data?.data?.access_token ??
+                res.data?.data?.token
+
+            if (!token) {
+                throw new Error("Token login tidak ditemukan pada response")
+            }
+
             // simpan token & user
-            localStorage.setItem("token", res.data.token)
+            localStorage.setItem("token", token)
             await fetchUser()
             navigate("/dashboard")
         } catch (err: any) {
