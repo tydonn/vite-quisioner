@@ -10,7 +10,8 @@ type User = {
 type AuthContextType = {
     user: User | null
     loading: boolean
-    fetchUser: () => Promise<void>
+    fetchUser: () => Promise<boolean>
+    setAuthenticatedUser: (user: User | null) => void
     logout: () => void
 }
 
@@ -20,13 +21,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
-    const fetchUser = async () => {
+    const fetchUser = async (): Promise<boolean> => {
         try {
             const res = await api.get("/me")
-            setUser(res.data.user)
+
+            // Support common response shapes:
+            // { user }, { data: { user } }, or { data: user }
+            const resolvedUser =
+                res.data?.user ??
+                res.data?.data?.user ??
+                res.data?.data ??
+                null
+
+            if (!resolvedUser) {
+                throw new Error("User tidak ditemukan pada response /me")
+            }
+
+            setUser(resolvedUser)
+            return true
         } catch (error) {
             setUser(null)
             localStorage.removeItem("token")
+            return false
         } finally {
             setLoading(false)
         }
@@ -35,6 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = () => {
         localStorage.removeItem("token")
         setUser(null)
+    }
+
+    const setAuthenticatedUser = (nextUser: User | null) => {
+        setUser(nextUser)
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -47,7 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, loading, fetchUser, logout }}>
+        <AuthContext.Provider
+            value={{ user, loading, fetchUser, setAuthenticatedUser, logout }}
+        >
             {children}
         </AuthContext.Provider>
     )

@@ -14,6 +14,7 @@ import BankPertanyaanTambahKategoriPage from "@/pages/BankPertanyaanTambahKatego
 import AuthLayout from "./components/layouts/AuthLayout"
 import DashboardLayout from "./components/layouts/DashboardLayout"
 import LoginPage from "./pages/auth/LoginPage"
+import SsoCallbackPage from "./pages/auth/SsoCallbackPage"
 import TipePilihanPage from "./pages/TipePilihanPage"
 
 export const router = createBrowserRouter([
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
                     {
                         index: true,
                         element: <LoginPage />,
+                    },
+                    {
+                        path: "sso/callback",
+                        element: <SsoCallbackPage />,
                     },
                 ],
             },

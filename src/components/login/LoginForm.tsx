@@ -49,7 +49,10 @@ export default function LoginForm() {
 
             // simpan token & user
             localStorage.setItem("token", token)
-            await fetchUser()
+            const isUserLoaded = await fetchUser()
+            if (!isUserLoaded) {
+                throw new Error("Gagal memuat profil user setelah login")
+            }
             navigate("/dashboard")
         } catch (err: any) {
             alert("Email atau password salah")
