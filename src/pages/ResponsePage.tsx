@@ -40,6 +40,28 @@ function normalizeProdiOption(item: ResponseFilterProdiOption): ProdiOption | nu
 }
 
 export default function ResponsePage() {
+    const storedRolesRaw =
+        typeof window !== "undefined"
+            ? localStorage.getItem("auth_roles")
+            : null
+    const storedProgramCode =
+        typeof window !== "undefined"
+            ? (localStorage.getItem("auth_program_code") ?? "")
+            : ""
+    const storedRoles: string[] = (() => {
+        if (!storedRolesRaw) return []
+        try {
+            const parsed = JSON.parse(storedRolesRaw) as unknown
+            if (!Array.isArray(parsed)) return []
+            return parsed.map((item) => String(item))
+        } catch {
+            return []
+        }
+    })()
+    const isAdministrator = storedRoles.some(
+        (role) => role.toLowerCase() === "administrator"
+    )
+
     const [data, setData] = useState<ResponseView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
@@ -68,7 +90,8 @@ export default function ResponsePage() {
                     params: {
                         page,
                         per_page: perPage,
-                        prodi_id: prodiFilter || undefined,
+                        prodi_id:
+                            (isAdministrator ? prodiFilter : storedProgramCode) || undefined,
                         tahun_akademik: tahunAkademikFilter || undefined,
                         include_total: true,
                     },
@@ -90,7 +113,7 @@ export default function ResponsePage() {
         }
 
         fetchData()
-    }, [page, perPage, prodiFilter, tahunAkademikFilter])
+    }, [page, perPage, prodiFilter, tahunAkademikFilter, isAdministrator, storedProgramCode])
 
     useEffect(() => {
         if (!loading) {
@@ -100,6 +123,14 @@ export default function ResponsePage() {
     }, [loading])
 
     useEffect(() => {
+        if (!isAdministrator) {
+            setIsProdiOpen(false)
+        }
+    }, [isAdministrator])
+
+    useEffect(() => {
+        if (!isAdministrator) return
+
         async function fetchProdiOptions() {
             setIsProdiLoading(true)
             try {
@@ -124,7 +155,7 @@ export default function ResponsePage() {
         }
 
         fetchProdiOptions()
-    }, [tahunAkademikInput, prodiSearch])
+    }, [tahunAkademikInput, prodiSearch, isAdministrator])
 
     if (loading) {
         return <SpinnerPage />
@@ -148,7 +179,7 @@ export default function ResponsePage() {
         : "All Prodi"
 
     const isFilterReady = Boolean(
-        prodiInput && tahunAkademikInput
+        isAdministrator ? prodiInput && tahunAkademikInput : tahunAkademikInput
     )
 
     return (
@@ -164,74 +195,76 @@ export default function ResponsePage() {
                     onChange={(e) => setSearch(e.target.value)}
                     className="max-w-40 whitespace-nowrap break-words shadow-sm"
                 />
-                <div className="relative w-56">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        className="h-9 w-full justify-start truncate"
-                        onClick={() => {
-                            setIsProdiOpen((prev) => !prev)
-                        }}
-                        title={selectedProdiLabel}
-                    >
-                        {selectedProdiLabel}
-                    </Button>
-                    {isProdiOpen && (
-                        <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
-                            <div className="flex items-center gap-2">
-                                <Input
-                                    placeholder="Cari Prodi..."
-                                    value={prodiQuery}
-                                    onChange={(e) => setProdiQuery(e.target.value)}
-                                    className="h-8"
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-8 px-2"
-                                    disabled={isProdiLoading}
-                                    onClick={() => {
-                                        setProdiSearch(prodiQuery)
-                                    }}
-                                >
-                                    {isProdiLoading ? (
-                                        <span className="inline-flex items-center gap-2">
-                                            <Spinner className="size-4" />
-                                            Search
-                                        </span>
-                                    ) : (
-                                        "Search"
-                                    )}
-                                </Button>
-                            </div>
-                            <div className="mt-2 max-h-56 overflow-y-auto">
-                                <button
-                                    type="button"
-                                    className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
-                                    onClick={() => {
-                                        setProdiInput("")
-                                        setIsProdiOpen(false)
-                                    }}
-                                >
-                                    All Prodi
-                                </button>
-                                {prodiOptions.map((item) => (
+                {isAdministrator && (
+                    <div className="relative w-56">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-9 w-full justify-start truncate"
+                            onClick={() => {
+                                setIsProdiOpen((prev) => !prev)
+                            }}
+                            title={selectedProdiLabel}
+                        >
+                            {selectedProdiLabel}
+                        </Button>
+                        {isProdiOpen && (
+                            <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        placeholder="Cari Prodi..."
+                                        value={prodiQuery}
+                                        onChange={(e) => setProdiQuery(e.target.value)}
+                                        className="h-8"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-8 px-2"
+                                        disabled={isProdiLoading}
+                                        onClick={() => {
+                                            setProdiSearch(prodiQuery)
+                                        }}
+                                    >
+                                        {isProdiLoading ? (
+                                            <span className="inline-flex items-center gap-2">
+                                                <Spinner className="size-4" />
+                                                Search
+                                            </span>
+                                        ) : (
+                                            "Search"
+                                        )}
+                                    </Button>
+                                </div>
+                                <div className="mt-2 max-h-56 overflow-y-auto">
                                     <button
-                                        key={item.id}
                                         type="button"
                                         className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
                                         onClick={() => {
-                                            setProdiInput(item.id)
+                                            setProdiInput("")
                                             setIsProdiOpen(false)
                                         }}
                                     >
-                                        {item.id} - {item.nama}
+                                        All Prodi
                                     </button>
-                                ))}
+                                    {prodiOptions.map((item) => (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
+                                            onClick={() => {
+                                                setProdiInput(item.id)
+                                                setIsProdiOpen(false)
+                                            }}
+                                        >
+                                            {item.id} - {item.nama}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                )}
                 <Input
                     placeholder="Filter Tahun Akademik..."
                     value={tahunAkademikInput}
@@ -243,7 +276,7 @@ export default function ResponsePage() {
                         disabled={!isFilterReady}
                         onClick={() => {
                             setIsFiltering(true)
-                            setProdiFilter(prodiInput)
+                            setProdiFilter(isAdministrator ? prodiInput : storedProgramCode)
                             setTahunAkademikFilter(tahunAkademikInput)
                             setPage(1)
                         }}
@@ -268,7 +301,9 @@ export default function ResponsePage() {
 
                             setIsDownloading(true)
                             try {
-                                const prodiId = selectedProdi?.id
+                                const prodiId = isAdministrator
+                                    ? selectedProdi?.id
+                                    : storedProgramCode
                                 const res = await api.get("/response-details/download", {
                                     responseType: "blob",
                                     params: {

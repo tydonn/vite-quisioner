@@ -10,6 +10,9 @@ type SsoExchangeResponse = {
     success?: boolean
     access_token?: string
     token?: string
+    program_code?: string
+    program_name?: string
+    roles?: string[]
     user?: {
         id: number
         name: string
@@ -18,6 +21,9 @@ type SsoExchangeResponse = {
     data?: {
         access_token?: string
         token?: string
+        program_code?: string
+        program_name?: string
+        roles?: string[]
         user?: {
             id: number
             name: string
@@ -71,6 +77,15 @@ export default function SsoCallbackPage() {
                 }
 
                 localStorage.setItem("token", token)
+                const roles = res.data?.roles ?? res.data?.data?.roles ?? []
+                const programCode =
+                    res.data?.program_code ?? res.data?.data?.program_code ?? ""
+                const programName =
+                    res.data?.program_name ?? res.data?.data?.program_name ?? ""
+                localStorage.setItem("auth_roles", JSON.stringify(roles))
+                localStorage.setItem("auth_program_code", String(programCode || ""))
+                localStorage.setItem("auth_program_name", String(programName || ""))
+
                 const exchangeUser = res.data?.user ?? res.data?.data?.user ?? null
                 if (exchangeUser) {
                     setAuthenticatedUser(exchangeUser)

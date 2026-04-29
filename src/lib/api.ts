@@ -45,6 +45,9 @@ async function probeSession(token: string): Promise<boolean> {
 function redirectToLogin() {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
+    localStorage.removeItem("auth_roles")
+    localStorage.removeItem("auth_program_code")
+    localStorage.removeItem("auth_program_name")
 
     if (!isRedirectingToLogin) {
         isRedirectingToLogin = true

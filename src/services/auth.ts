@@ -13,4 +13,7 @@ export const login = async (data: LoginPayload) => {
 export const logout = async () => {
     await api.post("/logout")
     localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    localStorage.removeItem("auth_roles")
+    localStorage.removeItem("auth_program_code")
 };

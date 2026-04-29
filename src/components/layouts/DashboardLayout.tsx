@@ -12,6 +12,37 @@ import SpinnerForSideBar from "@/pages/SpinnerForSideBar"
 
 export default function DashboardLayout() {
     const { user, loading } = useAuth()
+    const rolesRaw =
+        typeof window !== "undefined" ? localStorage.getItem("auth_roles") : null
+    const programCode =
+        typeof window !== "undefined"
+            ? (localStorage.getItem("auth_program_code") ?? "")
+            : ""
+    const programName =
+        typeof window !== "undefined"
+            ? (localStorage.getItem("auth_program_name") ?? "")
+            : ""
+
+    const roles: string[] = (() => {
+        if (!rolesRaw) return []
+        try {
+            const parsed = JSON.parse(rolesRaw) as unknown
+            if (!Array.isArray(parsed)) return []
+            return parsed.map((item) => String(item))
+        } catch {
+            return []
+        }
+    })()
+    const isAdministrator = roles.some(
+        (role) => role.toLowerCase() === "administrator"
+    )
+    const welcomeSuffix = isAdministrator
+        ? "Administrator"
+        : programName
+            ? ` ${programName}`
+            : programCode
+                ? ` ${programCode}`
+                : ""
 
     if (loading) return <SpinnerForSideBar />
 
@@ -29,7 +60,12 @@ export default function DashboardLayout() {
                     {/* Spacer */}
                     <div className="flex-1" />
 
-                    <LogoutDropdown />
+                    <div className="hidden text-right md:block">
+                        <p className="text-xs text-muted-foreground">
+                            EDOM QUISIONER {welcomeSuffix}
+                        </p>
+                    </div>
+                    <LogoutDropdown userName={user?.name} />
                 </header>
 
                 <main className="p-6">
