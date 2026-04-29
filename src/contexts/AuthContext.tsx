@@ -96,7 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             setUser(resolvedUser)
-            syncAuthMetaFromPayload(res.data)
+            const authMetaSource = localStorage.getItem("auth_meta_source")
+            if (authMetaSource !== "sso") {
+                syncAuthMetaFromPayload(res.data)
+            }
             return true
         } catch (error) {
             setUser(null)
@@ -104,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem("auth_roles")
             localStorage.removeItem("auth_program_code")
             localStorage.removeItem("auth_program_name")
+            localStorage.removeItem("auth_meta_source")
             return false
         } finally {
             setLoading(false)
@@ -115,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("auth_roles")
         localStorage.removeItem("auth_program_code")
         localStorage.removeItem("auth_program_name")
+        localStorage.removeItem("auth_meta_source")
         setUser(null)
     }
 

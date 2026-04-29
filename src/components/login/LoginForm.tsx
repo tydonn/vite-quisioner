@@ -49,6 +49,7 @@ export default function LoginForm() {
 
             // simpan token & user
             localStorage.setItem("token", token)
+            localStorage.setItem("auth_meta_source", "password")
             const isUserLoaded = await fetchUser()
             if (!isUserLoaded) {
                 throw new Error("Gagal memuat profil user setelah login")

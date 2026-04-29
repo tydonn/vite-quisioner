@@ -16,4 +16,6 @@ export const logout = async () => {
     localStorage.removeItem("user")
     localStorage.removeItem("auth_roles")
     localStorage.removeItem("auth_program_code")
+    localStorage.removeItem("auth_program_name")
+    localStorage.removeItem("auth_meta_source")
 };

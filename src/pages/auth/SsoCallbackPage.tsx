@@ -85,6 +85,7 @@ export default function SsoCallbackPage() {
                 localStorage.setItem("auth_roles", JSON.stringify(roles))
                 localStorage.setItem("auth_program_code", String(programCode || ""))
                 localStorage.setItem("auth_program_name", String(programName || ""))
+                localStorage.setItem("auth_meta_source", "sso")
 
                 const exchangeUser = res.data?.user ?? res.data?.data?.user ?? null
                 if (exchangeUser) {
