@@ -1,149 +1,472 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { useEffect, useMemo, useState } from "react"
+
 import {
-    BarChart,
-    Bar,
-    XAxis,
-    CartesianGrid,
-} from "recharts"
-import { type ChartConfig } from "@/components/ui/chart"
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
-const kpi = [
-    { title: "Rata-rata Kepuasan", value: "4.2 / 5" },
-    { title: "Total Responden", value: "128" },
-    { title: "Completion Rate", value: "92%" },
-]
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
 
-// const barData = [
-//     { label: "Sangat Puas", value: 52 },
-//     { label: "Puas", value: 40 },
-//     { label: "Netral", value: 22 },
-//     { label: "Tidak Puas", value: 10 },
-//     { label: "Sangat Tidak Puas", value: 4 },
-// ]
+import type { ResponseFilterProdiOption } from "@/features/response/types"
 
-// const pieData = [
-//     { name: "Mahasiswa", value: 80 },
-//     { name: "Staff", value: 30 },
-//     { name: "Dosen", value: 18 },
-// ]
+import api from "@/lib/api"
+import SpinnerPage from "@/pages/SpinnerPage"
 
-//example
-const chartData = [
-    { month: "January", sangatpuas: 186, puas: 80, netral: 40, tidakpuas: 20, sangattidakpuas: 10 },
-    { month: "February", sangatpuas: 305, puas: 200, netral: 120, tidakpuas: 100, sangattidakpuas: 80 },
-    { month: "March", sangatpuas: 237, puas: 120, netral: 90, tidakpuas: 50, sangattidakpuas: 30 },
-    { month: "April", sangatpuas: 73, puas: 190, netral: 70, tidakpuas: 40, sangattidakpuas: 20 },
-    { month: "May", sangatpuas: 209, puas: 130, netral: 90, tidakpuas: 50, sangattidakpuas: 30 },
-    { month: "June", sangatpuas: 214, puas: 140, netral: 100, tidakpuas: 60, sangattidakpuas: 40 },
-    { month: "July", sangatpuas: 218, puas: 150, netral: 110, tidakpuas: 70, sangattidakpuas: 50 },
-    { month: "August", sangatpuas: 250, puas: 160, netral: 120, tidakpuas: 80, sangattidakpuas: 60 },
-    { month: "September", sangatpuas: 300, puas: 170, netral: 130, tidakpuas: 90, sangattidakpuas: 70 },
-    { month: "October", sangatpuas: 320, puas: 180, netral: 140, tidakpuas: 100, sangattidakpuas: 80 },
-    { month: "November", sangatpuas: 340, puas: 190, netral: 150, tidakpuas: 110, sangattidakpuas: 90 },
-    { month: "December", sangatpuas: 360, puas: 200, netral: 160, tidakpuas: 120, sangattidakpuas: 100 },
-]
+type ProdiOption = {
+    id: string
+    nama: string
+}
 
-const chartConfig = {
-    sangatpuas: {
-        label: "Sangat Puas",
-        color: "#2563eb",
-    },
-    puas: {
-        label: "Puas",
-        color: "#60a5fa",
-    },
-    netral: {
-        label: "Netral",
-        color: "#fbbf24",
-    },
-    tidakpuas: {
-        label: "Tidak Puas",
-        color: "#f87171",
-    },
-    sangattidakpuas: {
-        label: "Sangat Tidak Puas",
-        color: "#b91c1c",
+type ResultByDosenItem = {
+    tahun_akademik?: string | number
+    TahunAkademik?: string | number
+    prodi?: {
+        ProdiID?: string | number
+        Nama?: string
     }
-} satisfies ChartConfig
+    dosen?: {
+        Login?: string | number
+        Nama?: string
+    }
+    averagetypequestion?: {
+        Assurance?: number
+        Empathy?: number
+        Reliability?: number
+        Responsiveness?: number
+        Tangibles?: number
+        AvarageTotal?: number
+    }
+}
+
+type ResultByDosenResponse = {
+    success?: boolean
+    data?: ResultByDosenItem[]
+    pagination?: {
+        current_page?: number
+        per_page?: number
+        total?: number
+        last_page?: number
+    }
+}
+
+function normalizeProdiOption(item: ResponseFilterProdiOption): ProdiOption | null {
+    const rawId = item.ProdiID
+    const rawNama = item.Nama
+    if (!rawId || !rawNama) return null
+
+    return {
+        id: String(rawId),
+        nama: String(rawNama),
+    }
+}
+
+function parseRoles(raw: string | null): string[] {
+    if (!raw) return []
+    try {
+        const parsed = JSON.parse(raw) as unknown
+        if (Array.isArray(parsed)) {
+            return parsed.map((item) => String(item))
+        }
+        if (typeof parsed === "string" && parsed.trim()) {
+            return [parsed.trim()]
+        }
+        return []
+    } catch {
+        return raw.trim() ? [raw.trim()] : []
+    }
+}
+
+function formatNumber(value: number | undefined): string {
+    if (value === undefined || value === null || Number.isNaN(value)) return "-"
+    return value.toFixed(2)
+}
 
 export default function HasilAnalisisPage() {
-    return (
-        <div className="space-y-6">
-            <h1 className="text-xl font-semibold">Hasil & Analisis</h1>
+    const storedRolesRaw =
+        typeof window !== "undefined"
+            ? localStorage.getItem("auth_roles")
+            : null
+    const storedProgramCode =
+        typeof window !== "undefined"
+            ? (localStorage.getItem("auth_program_code") ?? "")
+            : ""
+    const storedRoles = parseRoles(storedRolesRaw)
+    const isAdministrator = storedRoles.some(
+        (role) => role.toLowerCase() === "administrator"
+    )
 
-            {/* KPI */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {kpi.map((item) => (
-                    <Card className="shadow-sm" key={item.title}>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">
-                                {item.title}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-bold">
-                            {item.value}
-                        </CardContent>
-                    </Card>
-                ))}
+    const [allData, setAllData] = useState<ResultByDosenItem[]>([])
+    const [loading, setLoading] = useState(true)
+    const [prodiInput, setProdiInput] = useState("")
+    const [prodiQuery, setProdiQuery] = useState("")
+    const [prodiSearch, setProdiSearch] = useState("")
+    const [tahunAkademikInput, setTahunAkademikInput] = useState("")
+    const [prodiFilter, setProdiFilter] = useState("")
+    const [tahunAkademikFilter, setTahunAkademikFilter] = useState("")
+    const [page, setPage] = useState(1)
+    const [perPage, setPerPage] = useState(10)
+    const [lastPage, setLastPage] = useState(1)
+    const [total, setTotal] = useState(0)
+    const [prodiOptions, setProdiOptions] = useState<ProdiOption[]>([])
+    const [isProdiOpen, setIsProdiOpen] = useState(false)
+    const [isFiltering, setIsFiltering] = useState(false)
+    const [isProdiLoading, setIsProdiLoading] = useState(false)
+    const [isPaging, setIsPaging] = useState(false)
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true)
+            try {
+                const res = await api.get<ResultByDosenResponse>(
+                    "/response-details/result-by-dosen",
+                    {
+                        params: {
+                            prodi_id:
+                                (isAdministrator ? prodiFilter : storedProgramCode) || undefined,
+                            tahun_akademik: tahunAkademikFilter || undefined,
+                        },
+                    }
+                )
+
+                const rows = Array.isArray(res.data?.data) ? res.data.data : []
+                setAllData(rows)
+            } catch (error) {
+                console.error("Gagal mengambil data hasil analisis", error)
+                setAllData([])
+                setLastPage(1)
+                setTotal(0)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchData()
+    }, [prodiFilter, tahunAkademikFilter, isAdministrator, storedProgramCode])
+
+    useEffect(() => {
+        const nextTotal = allData.length
+        const nextLastPage = Math.max(1, Math.ceil(nextTotal / perPage))
+        setTotal(nextTotal)
+        setLastPage(nextLastPage)
+        setPage((prev) => Math.min(prev, nextLastPage))
+    }, [allData, perPage])
+
+    useEffect(() => {
+        if (!loading) {
+            setIsFiltering(false)
+            setIsPaging(false)
+        }
+    }, [loading])
+
+    useEffect(() => {
+        if (!isAdministrator) {
+            setIsProdiOpen(false)
+        }
+    }, [isAdministrator])
+
+    useEffect(() => {
+        if (!isAdministrator) return
+
+        async function fetchProdiOptions() {
+            setIsProdiLoading(true)
+            try {
+                const res = await api.get<{ data?: ResponseFilterProdiOption[] }>(
+                    "/responses/filter-options/prodi",
+                    {
+                        params: {
+                            tahun_akademik: tahunAkademikInput || undefined,
+                            q: prodiQuery || undefined,
+                        },
+                    }
+                )
+                const options = (res.data.data ?? [])
+                    .map(normalizeProdiOption)
+                    .filter((item): item is ProdiOption => item !== null)
+                setProdiOptions(options)
+            } catch (error) {
+                console.error("Gagal mengambil opsi prodi", error)
+            } finally {
+                setIsProdiLoading(false)
+            }
+        }
+
+        fetchProdiOptions()
+    }, [tahunAkademikInput, prodiSearch, isAdministrator, prodiQuery])
+
+    const selectedProdi = prodiOptions.find((item) => item.id === prodiInput)
+    const selectedProdiLabel = selectedProdi
+        ? `${selectedProdi.id} - ${selectedProdi.nama}`
+        : "All Prodi"
+
+    const isFilterReady = Boolean(
+        isAdministrator ? prodiInput && tahunAkademikInput : tahunAkademikInput
+    )
+    const hasActiveFilter = Boolean(
+        prodiInput ||
+        prodiQuery ||
+        tahunAkademikInput ||
+        prodiFilter ||
+        tahunAkademikFilter
+    )
+    const data = useMemo(() => {
+        const start = (page - 1) * perPage
+        const end = start + perPage
+        return allData.slice(start, end)
+    }, [allData, page, perPage])
+
+    if (loading) {
+        return <SpinnerPage />
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <h1 className="text-xl font-semibold">Hasil & Analisis</h1>
             </div>
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                {/* Bar Chart */}
-                <Card className="shadow-sm">
-                    <CardHeader>
-                        <CardTitle>Distribusi Kepuasan</CardTitle>
-                        <CardDescription>Perbandingan jumlah Responden berdasarkan tingkat Kepuasan</CardDescription>
-                    </CardHeader>
-                    <ChartContainer config={chartConfig} >
-                        <BarChart accessibilityLayer data={chartData}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="month"
-                                tickLine={false}
-                                tickMargin={10}
-                                axisLine={false}
-                                tickFormatter={(value) => value.slice(0, 3)}
-                            />
-                            <ChartTooltip content={<ChartTooltipContent />} />
-                            <ChartLegend content={<ChartLegendContent />} />
-                            <Bar dataKey="sangatpuas" fill="var(--color-sangatpuas)" radius={4} />
-                            <Bar dataKey="puas" fill="var(--color-puas)" radius={4} />
-                            <Bar dataKey="netral" fill="var(--color-netral)" radius={4} />
-                            <Bar dataKey="tidakpuas" fill="var(--color-tidakpuas)" radius={4} />
-                            <Bar dataKey="sangattidakpuas" fill="var(--color-sangattidakpuas)" radius={4} />
-                        </BarChart>
-                    </ChartContainer>
-                </Card>
-
-
-                {/* Pie Chart */}
-                {/* <Card>
-                    <CardHeader>
-                        <CardTitle>Jenis Responden</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={pieData}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    outerRadius={90}
-                                    label
-                                >
-                                    {pieData.map((_, index) => (
-                                        <Cell key={index} />
+            <div className="flex flex-wrap items-center gap-3">
+                {isAdministrator && (
+                    <div className="relative w-56">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-9 w-full justify-start truncate"
+                            onClick={() => setIsProdiOpen((prev) => !prev)}
+                            title={selectedProdiLabel}
+                        >
+                            {selectedProdiLabel}
+                        </Button>
+                        {isProdiOpen && (
+                            <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        placeholder="Cari Prodi..."
+                                        value={prodiQuery}
+                                        onChange={(e) => setProdiQuery(e.target.value)}
+                                        className="h-8"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="h-8 px-2"
+                                        disabled={isProdiLoading}
+                                        onClick={() => setProdiSearch(prodiQuery)}
+                                    >
+                                        {isProdiLoading ? (
+                                            <span className="inline-flex items-center gap-2">
+                                                <Spinner className="size-4" />
+                                                Search
+                                            </span>
+                                        ) : (
+                                            "Search"
+                                        )}
+                                    </Button>
+                                </div>
+                                <div className="mt-2 max-h-56 overflow-y-auto">
+                                    <button
+                                        type="button"
+                                        className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
+                                        onClick={() => {
+                                            setProdiInput("")
+                                            setIsProdiOpen(false)
+                                        }}
+                                    >
+                                        All Prodi
+                                    </button>
+                                    {prodiOptions.map((item) => (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
+                                            onClick={() => {
+                                                setProdiInput(item.id)
+                                                setIsProdiOpen(false)
+                                            }}
+                                        >
+                                            {item.id} - {item.nama}
+                                        </button>
                                     ))}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card> */}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
 
+                <Input
+                    placeholder="Filter Tahun Akademik..."
+                    value={tahunAkademikInput}
+                    onChange={(e) => setTahunAkademikInput(e.target.value)}
+                    className="max-w-40 shadow-sm"
+                />
+
+                <div className="ml-auto flex items-center gap-3">
+                    <Button
+                        disabled={!isFilterReady}
+                        onClick={() => {
+                            setIsFiltering(true)
+                            setProdiFilter(isAdministrator ? prodiInput : storedProgramCode)
+                            setTahunAkademikFilter(tahunAkademikInput)
+                            setPage(1)
+                        }}
+                    >
+                        {isFiltering ? (
+                            <span className="inline-flex items-center gap-2">
+                                <Spinner className="size-4" />
+                                Memfilter...
+                            </span>
+                        ) : (
+                            "Filter"
+                        )}
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={!hasActiveFilter}
+                        onClick={() => {
+                            setProdiInput("")
+                            setProdiQuery("")
+                            setProdiSearch("")
+                            setTahunAkademikInput("")
+                            setProdiFilter("")
+                            setTahunAkademikFilter("")
+                            setPage(1)
+                            setIsProdiOpen(false)
+                        }}
+                    >
+                        Reset Filter
+                    </Button>
+
+                </div>
+            </div>
+
+            <div className="border rounded-lg shadow-sm">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Tahun Akademik</TableHead>
+                            <TableHead>Prodi</TableHead>
+                            <TableHead>Dosen</TableHead>
+                            <TableHead>Assurance</TableHead>
+                            <TableHead>Empathy</TableHead>
+                            <TableHead>Reliability</TableHead>
+                            <TableHead>Responsiveness</TableHead>
+                            <TableHead>Tangibles</TableHead>
+                            <TableHead>Rata-Rata Total</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {data.map((row, idx) => (
+                            <TableRow key={`${row.dosen?.Login ?? "dosen"}-${idx}`}>
+                                <TableCell className="py-3">
+                                    {row.TahunAkademik
+                                        ? String(row.TahunAkademik)
+                                        : row.tahun_akademik
+                                            ? String(row.tahun_akademik)
+                                            : "-"}
+                                </TableCell>
+                                <TableCell className="max-w-40 whitespace-normal py-3">
+                                    <div>{row.prodi?.ProdiID ? String(row.prodi.ProdiID) : "-"}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {row.prodi?.Nama ?? "-"}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="max-w-40 whitespace-normal py-3">
+                                    <div>{row.dosen?.Login ? String(row.dosen.Login) : "-"}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {row.dosen?.Nama ?? "-"}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    {formatNumber(row.averagetypequestion?.Assurance)}
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    {formatNumber(row.averagetypequestion?.Empathy)}
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    {formatNumber(row.averagetypequestion?.Reliability)}
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    {formatNumber(row.averagetypequestion?.Responsiveness)}
+                                </TableCell>
+                                <TableCell className="py-3">
+                                    {formatNumber(row.averagetypequestion?.Tangibles)}
+                                </TableCell>
+                                <TableCell className="py-3 font-medium">
+                                    {formatNumber(row.averagetypequestion?.AvarageTotal)}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-lg border bg-background p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>Per halaman</span>
+                    <select
+                        className="rounded border px-2 py-1"
+                        value={perPage}
+                        onChange={(e) => {
+                            setIsPaging(true)
+                            setPerPage(Number(e.target.value))
+                            setPage(1)
+                        }}
+                    >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
+                    <span>Total {total}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                            setIsPaging(true)
+                            setPage((prev) => Math.max(1, prev - 1))
+                        }}
+                        disabled={page <= 1}
+                    >
+                        {isPaging ? (
+                            <span className="inline-flex items-center gap-2">
+                                <Spinner className="size-4" />
+                                Sebelumnya
+                            </span>
+                        ) : (
+                            "Sebelumnya"
+                        )}
+                    </Button>
+                    <div className="text-sm text-muted-foreground">
+                        Halaman {page} / {lastPage}
+                    </div>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                            setIsPaging(true)
+                            setPage((prev) => Math.min(lastPage, prev + 1))
+                        }}
+                        disabled={page >= lastPage}
+                    >
+                        {isPaging ? (
+                            <span className="inline-flex items-center gap-2">
+                                <Spinner className="size-4" />
+                                Berikutnya
+                            </span>
+                        ) : (
+                            "Berikutnya"
+                        )}
+                    </Button>
+                </div>
             </div>
         </div>
     )

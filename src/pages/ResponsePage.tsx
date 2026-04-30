@@ -64,7 +64,6 @@ export default function ResponsePage() {
 
     const [data, setData] = useState<ResponseView[]>([])
     const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState("")
     const [prodiInput, setProdiInput] = useState("")
     const [prodiQuery, setProdiQuery] = useState("")
     const [prodiSearch, setProdiSearch] = useState("")
@@ -161,17 +160,6 @@ export default function ResponsePage() {
         return <SpinnerPage />
     }
 
-    const filtered = data.filter(
-        (item) =>
-            item.mahasiswaId.toLowerCase().includes(search.toLowerCase()) ||
-            item.dosenId.toLowerCase().includes(search.toLowerCase()) ||
-            item.dosenNama.toLowerCase().includes(search.toLowerCase()) ||
-            item.matakuliahId.toLowerCase().includes(search.toLowerCase()) ||
-            item.matakuliahKode.toLowerCase().includes(search.toLowerCase()) ||
-            item.prodiNama.toLowerCase().includes(search.toLowerCase()) ||
-            item.semester.toLowerCase().includes(search.toLowerCase())
-    )
-
     const selectedProdi = prodiOptions.find((item) => item.id === prodiInput)
 
     const selectedProdiLabel = selectedProdi
@@ -181,6 +169,13 @@ export default function ResponsePage() {
     const isFilterReady = Boolean(
         isAdministrator ? prodiInput && tahunAkademikInput : tahunAkademikInput
     )
+    const hasActiveFilter = Boolean(
+        prodiInput ||
+        prodiQuery ||
+        tahunAkademikInput ||
+        prodiFilter ||
+        tahunAkademikFilter
+    )
 
     return (
         <div className="space-y-4">
@@ -189,12 +184,6 @@ export default function ResponsePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                <Input
-                    placeholder="Cari response..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="max-w-40 whitespace-nowrap break-words shadow-sm"
-                />
                 {isAdministrator && (
                     <div className="relative w-56">
                         <Button
@@ -272,6 +261,7 @@ export default function ResponsePage() {
                     className="max-w-40 shadow-sm"
                 />
                 <div className="ml-auto flex items-center gap-3">
+
                     <Button
                         disabled={!isFilterReady}
                         onClick={() => {
@@ -289,6 +279,23 @@ export default function ResponsePage() {
                         ) : (
                             "Filter"
                         )}
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        disabled={!hasActiveFilter}
+                        onClick={() => {
+                            setProdiInput("")
+                            setProdiQuery("")
+                            setProdiSearch("")
+                            setTahunAkademikInput("")
+                            setProdiFilter("")
+                            setTahunAkademikFilter("")
+                            setPage(1)
+                            setIsProdiOpen(false)
+                        }}
+                    >
+                        Reset Filter
                     </Button>
                     <Button
                         variant="outline"
@@ -382,7 +389,7 @@ export default function ResponsePage() {
                     </TableHeader>
 
                     <TableBody>
-                        {filtered.map((row) => (
+                        {data.map((row) => (
                             <TableRow key={row.id}>
                                 <TableCell className="font-medium py-3">
                                     {row.id}
