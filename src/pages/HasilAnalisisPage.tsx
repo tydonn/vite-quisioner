@@ -118,8 +118,15 @@ export default function HasilAnalisisPage() {
     const [isFiltering, setIsFiltering] = useState(false)
     const [isProdiLoading, setIsProdiLoading] = useState(false)
     const [isPaging, setIsPaging] = useState(false)
+    const [hasAppliedFilter, setHasAppliedFilter] = useState(false)
 
     useEffect(() => {
+        if (!hasAppliedFilter) {
+            setAllData([])
+            setLoading(false)
+            return
+        }
+
         async function fetchData() {
             setLoading(true)
             try {
@@ -147,7 +154,7 @@ export default function HasilAnalisisPage() {
         }
 
         fetchData()
-    }, [prodiFilter, tahunAkademikFilter, isAdministrator, storedProgramCode])
+    }, [hasAppliedFilter, prodiFilter, tahunAkademikFilter, isAdministrator, storedProgramCode])
 
     useEffect(() => {
         const nextTotal = allData.length
@@ -310,6 +317,7 @@ export default function HasilAnalisisPage() {
                         disabled={!isFilterReady}
                         onClick={() => {
                             setIsFiltering(true)
+                            setHasAppliedFilter(true)
                             setProdiFilter(isAdministrator ? prodiInput : storedProgramCode)
                             setTahunAkademikFilter(tahunAkademikInput)
                             setPage(1)
@@ -335,6 +343,7 @@ export default function HasilAnalisisPage() {
                             setTahunAkademikInput("")
                             setProdiFilter("")
                             setTahunAkademikFilter("")
+                            setHasAppliedFilter(false)
                             setPage(1)
                             setIsProdiOpen(false)
                         }}
@@ -346,64 +355,70 @@ export default function HasilAnalisisPage() {
             </div>
 
             <div className="border rounded-lg shadow-sm">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Tahun Akademik</TableHead>
-                            <TableHead>Prodi</TableHead>
-                            <TableHead>Dosen</TableHead>
-                            <TableHead>Assurance</TableHead>
-                            <TableHead>Empathy</TableHead>
-                            <TableHead>Reliability</TableHead>
-                            <TableHead>Responsiveness</TableHead>
-                            <TableHead>Tangibles</TableHead>
-                            <TableHead>Rata-Rata Total</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {data.map((row, idx) => (
-                            <TableRow key={`${row.dosen?.Login ?? "dosen"}-${idx}`}>
-                                <TableCell className="py-3">
-                                    {row.TahunAkademik
-                                        ? String(row.TahunAkademik)
-                                        : row.tahun_akademik
-                                            ? String(row.tahun_akademik)
-                                            : "-"}
-                                </TableCell>
-                                <TableCell className="max-w-40 whitespace-normal py-3">
-                                    <div>{row.prodi?.ProdiID ? String(row.prodi.ProdiID) : "-"}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                        {row.prodi?.Nama ?? "-"}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="max-w-40 whitespace-normal py-3">
-                                    <div>{row.dosen?.Login ? String(row.dosen.Login) : "-"}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                        {row.dosen?.Nama ?? "-"}
-                                    </div>
-                                </TableCell>
-                                <TableCell className="py-3">
-                                    {formatNumber(row.averagetypequestion?.Assurance)}
-                                </TableCell>
-                                <TableCell className="py-3">
-                                    {formatNumber(row.averagetypequestion?.Empathy)}
-                                </TableCell>
-                                <TableCell className="py-3">
-                                    {formatNumber(row.averagetypequestion?.Reliability)}
-                                </TableCell>
-                                <TableCell className="py-3">
-                                    {formatNumber(row.averagetypequestion?.Responsiveness)}
-                                </TableCell>
-                                <TableCell className="py-3">
-                                    {formatNumber(row.averagetypequestion?.Tangibles)}
-                                </TableCell>
-                                <TableCell className="py-3 font-medium">
-                                    {formatNumber(row.averagetypequestion?.AvarageTotal)}
-                                </TableCell>
+                {!hasAppliedFilter ? (
+                    <div className="py-10 text-center text-sm text-muted-foreground">
+                        Mohon isi filter terlebih dahulu
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Tahun Akademik</TableHead>
+                                <TableHead>Prodi</TableHead>
+                                <TableHead>Dosen</TableHead>
+                                <TableHead>Assurance</TableHead>
+                                <TableHead>Empathy</TableHead>
+                                <TableHead>Reliability</TableHead>
+                                <TableHead>Responsiveness</TableHead>
+                                <TableHead>Tangibles</TableHead>
+                                <TableHead>Rata-Rata Total</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {data.map((row, idx) => (
+                                <TableRow key={`${row.dosen?.Login ?? "dosen"}-${idx}`}>
+                                    <TableCell className="py-3">
+                                        {row.TahunAkademik
+                                            ? String(row.TahunAkademik)
+                                            : row.tahun_akademik
+                                                ? String(row.tahun_akademik)
+                                                : "-"}
+                                    </TableCell>
+                                    <TableCell className="max-w-40 whitespace-normal py-3">
+                                        <div>{row.prodi?.ProdiID ? String(row.prodi.ProdiID) : "-"}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {row.prodi?.Nama ?? "-"}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="max-w-40 whitespace-normal py-3">
+                                        <div>{row.dosen?.Login ? String(row.dosen.Login) : "-"}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {row.dosen?.Nama ?? "-"}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        {formatNumber(row.averagetypequestion?.Assurance)}
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        {formatNumber(row.averagetypequestion?.Empathy)}
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        {formatNumber(row.averagetypequestion?.Reliability)}
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        {formatNumber(row.averagetypequestion?.Responsiveness)}
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        {formatNumber(row.averagetypequestion?.Tangibles)}
+                                    </TableCell>
+                                    <TableCell className="py-3 font-medium">
+                                        {formatNumber(row.averagetypequestion?.AvarageTotal)}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
             </div>
 
             <div className="flex flex-col gap-3 rounded-lg border bg-background p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
