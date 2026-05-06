@@ -18,8 +18,8 @@ function mapAnswerType(type: string): TipeJawaban {
     }
 }
 
-function mapStatus(isActive: number): StatusAktif {
-    return isActive === 1 ? "Aktif" : "Nonaktif"
+function mapStatus(isActive: number | string | null | undefined): StatusAktif {
+    return Number(isActive) === 1 ? "Aktif" : "Nonaktif"
 }
 
 export function mapAspectToPertanyaanView(
