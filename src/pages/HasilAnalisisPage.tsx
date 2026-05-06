@@ -12,15 +12,27 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import type { ResponseFilterProdiOption } from "@/features/response/types"
 
 import api from "@/lib/api"
-import SpinnerPage from "@/pages/SpinnerPage"
 
 type ProdiOption = {
     id: string
     nama: string
+}
+
+type TahunAkademikOption = {
+    tahunId: string
 }
 
 type ResultByDosenItem = {
@@ -64,6 +76,14 @@ function normalizeProdiOption(item: ResponseFilterProdiOption): ProdiOption | nu
         id: String(rawId),
         nama: String(rawNama),
     }
+}
+
+function normalizeTahunAkademikOption(item: unknown): TahunAkademikOption | null {
+    if (!item || typeof item !== "object") return null
+    const record = item as Record<string, unknown>
+    const raw = record.TahunID
+    if (!raw) return null
+    return { tahunId: String(raw) }
 }
 
 function parseRoles(raw: string | null): string[] {
@@ -114,6 +134,7 @@ export default function HasilAnalisisPage() {
     const [lastPage, setLastPage] = useState(1)
     const [total, setTotal] = useState(0)
     const [prodiOptions, setProdiOptions] = useState<ProdiOption[]>([])
+    const [tahunAkademikOptions, setTahunAkademikOptions] = useState<TahunAkademikOption[]>([])
     const [isProdiOpen, setIsProdiOpen] = useState(false)
     const [isFiltering, setIsFiltering] = useState(false)
     const [isProdiLoading, setIsProdiLoading] = useState(false)
@@ -131,7 +152,7 @@ export default function HasilAnalisisPage() {
             setLoading(true)
             try {
                 const res = await api.get<ResultByDosenResponse>(
-                    "/response-details/result-by-dosen",
+                    "/response-details/result-avarage",
                     {
                         params: {
                             prodi_id:
@@ -206,6 +227,23 @@ export default function HasilAnalisisPage() {
         fetchProdiOptions()
     }, [tahunAkademikInput, prodiSearch, isAdministrator, prodiQuery])
 
+    useEffect(() => {
+        async function fetchTahunAkademikOptions() {
+            try {
+                const res = await api.get<{ data?: unknown[] }>("/tahun-akademik/options")
+                const options = (res.data.data ?? [])
+                    .map(normalizeTahunAkademikOption)
+                    .filter((item): item is TahunAkademikOption => item !== null)
+                setTahunAkademikOptions(options)
+            } catch (error) {
+                console.error("Gagal mengambil opsi tahun akademik", error)
+                setTahunAkademikOptions([])
+            }
+        }
+
+        fetchTahunAkademikOptions()
+    }, [])
+
     const selectedProdi = prodiOptions.find((item) => item.id === prodiInput)
     const selectedProdiLabel = selectedProdi
         ? `${selectedProdi.id} - ${selectedProdi.nama}`
@@ -226,10 +264,6 @@ export default function HasilAnalisisPage() {
         const end = start + perPage
         return allData.slice(start, end)
     }, [allData, page, perPage])
-
-    if (loading) {
-        return <SpinnerPage />
-    }
 
     return (
         <div className="space-y-4">
@@ -305,12 +339,33 @@ export default function HasilAnalisisPage() {
                     </div>
                 )}
 
-                <Input
-                    placeholder="Filter Tahun Akademik..."
-                    value={tahunAkademikInput}
-                    onChange={(e) => setTahunAkademikInput(e.target.value)}
-                    className="max-w-40 shadow-sm"
-                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-9 w-48 justify-start">
+                            {tahunAkademikInput || "Pilih Tahun Akademik"}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Tahun Akademik</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup
+                                value={tahunAkademikInput}
+                                onValueChange={setTahunAkademikInput}
+                            >
+                                <div className="max-h-56 overflow-y-auto">
+                                    {tahunAkademikOptions.map((item) => (
+                                        <DropdownMenuRadioItem
+                                            key={item.tahunId}
+                                            value={item.tahunId}
+                                        >
+                                            {item.tahunId}
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                </div>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 <div className="ml-auto flex items-center gap-3">
                     <Button
@@ -358,6 +413,13 @@ export default function HasilAnalisisPage() {
                 {!hasAppliedFilter ? (
                     <div className="py-10 text-center text-sm text-muted-foreground">
                         Mohon isi filter terlebih dahulu
+                    </div>
+                ) : loading ? (
+                    <div className="py-10 text-center text-sm text-muted-foreground">
+                        <span className="inline-flex items-center gap-2">
+                            <Spinner className="size-4" />
+                            Sedang memuat data...
+                        </span>
                     </div>
                 ) : (
                     <Table>
