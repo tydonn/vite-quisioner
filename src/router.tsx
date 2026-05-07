@@ -7,6 +7,7 @@ import BankPertanyaanPage from "@/pages/BankPertanyaanPage"
 import ResponsePage from "@/pages/ResponsePage"
 import ResponseDetailPage from "@/pages/ResponseDetailPage"
 import HasilAnalisisPage from "@/pages/HasilAnalisisPage"
+import HasilAnalisisPersentasePage from "@/pages/HasilAnalisisPersentasePage"
 import LaporanPage from "@/pages/LaporanPage"
 import TindakLanjutPage from "@/pages/TindakLanjutPage"
 import BankPertanyaanTambahPage from "@/pages/BankPertanyaanTambahPage"
@@ -81,8 +82,12 @@ export const router = createBrowserRouter([
                         element: <ResponseDetailPage />,
                     },
                     {
-                        path: "hasil",
+                        path: "hasil/rata-rata",
                         element: <HasilAnalisisPage />,
+                    },
+                    {
+                        path: "hasil/persentase-choice-value",
+                        element: <HasilAnalisisPersentasePage />,
                     },
                     {
                         path: "laporan",

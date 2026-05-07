@@ -268,7 +268,7 @@ export default function HasilAnalisisPage() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Hasil & Analisis</h1>
+                <h1 className="text-xl font-semibold">Rata-Rata</h1>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">

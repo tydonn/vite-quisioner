@@ -4,8 +4,13 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 export default defineConfig({
-  base: "/", // ⬅️ penting untuk cPanel (root domain)
+  base: "/",
   plugins: [react(), tailwindcss()],
+
+  server: {
+    allowedHosts: true,
+  },
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

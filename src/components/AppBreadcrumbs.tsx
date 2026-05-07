@@ -20,6 +20,9 @@ export function AppBreadcrumbs() {
     const labelMap: Record<string, string> = {
         response: "Response",
         detail: "Response Detail",
+        hasil: "Hasil & Analisis",
+        "rata-rata": "Rata-Rata",
+        "persentase-choice-value": "Persentase Choice Value",
     }
 
     return (

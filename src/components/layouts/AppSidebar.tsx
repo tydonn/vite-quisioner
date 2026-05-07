@@ -40,6 +40,7 @@ import logoIcon from "@/assets/logo-icon.png"
 export function AppSidebar() {
     const { pathname } = useLocation()
     const [openMaster, setOpenMaster] = useState(true)
+    const [openAnalisis, setOpenAnalisis] = useState(true)
     const { state } = useSidebar()
 
     return (
@@ -192,17 +193,46 @@ export function AppSidebar() {
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem> */}
-                            <SidebarMenuItem>
+                            <SidebarMenuItem data-open={openAnalisis}>
                                 <SidebarMenuButton
-                                    asChild
-                                    isActive={pathname === "/hasil"}
+                                    onClick={() => setOpenAnalisis(!openAnalisis)}
                                     tooltip="Hasil & Analisis"
                                 >
-                                    <Link to="/hasil">
-                                        <BarChart3 />
-                                        <span>Hasil & Analisis</span>
-                                    </Link>
+                                    <BarChart3 />
+                                    <span>Hasil & Analisis</span>
                                 </SidebarMenuButton>
+                                <SidebarMenuAction
+                                    onClick={() => setOpenAnalisis(!openAnalisis)}
+                                    showOnHover
+                                >
+                                    <ChevronRight
+                                        className={`transition-transform ${openAnalisis ? "rotate-90" : ""}`}
+                                    />
+                                </SidebarMenuAction>
+                                {openAnalisis && (
+                                    <SidebarMenuSub>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/hasil/rata-rata"}
+                                            >
+                                                <Link to="/hasil/rata-rata">
+                                                    <span>Rata-Rata</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={pathname === "/hasil/persentase-choice-value"}
+                                            >
+                                                <Link to="/hasil/persentase-choice-value">
+                                                    <span>Persentase Choice Value</span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                    </SidebarMenuSub>
+                                )}
                             </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
