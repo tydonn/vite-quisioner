@@ -104,36 +104,36 @@ export default function HasilAnalisisPersentasePage() {
         if (!hasAppliedFilter) return
         setLoading(true)
         setErrorMessage("")
-        ; (async () => {
-            const params = {
-                tahun_akademik: tahunAkademikFilter || undefined,
-                TahunAkademik: tahunAkademikFilter || undefined,
-                prodi_id: (isAdministrator ? prodiFilter : storedProgramCode) || undefined,
-            }
-            const endpoints = [
-                "/response-details/result-precentage",
-                "/response-details/percentage-choice-value",
-                "/response-details/precentage-choice-value",
-            ]
-
-            for (const endpoint of endpoints) {
-                try {
-                    const res = await api.get<{ data?: PercentageItem[] }>(endpoint, { params })
-                    const rows = Array.isArray(res.data?.data)
-                        ? res.data.data
-                        : Array.isArray(res.data)
-                            ? (res.data as unknown as PercentageItem[])
-                            : []
-                    setAllData(rows)
-                    return
-                } catch (error) {
-                    console.error(`Gagal mengambil data dari ${endpoint}`, error)
+            ; (async () => {
+                const params = {
+                    tahun_akademik: tahunAkademikFilter || undefined,
+                    TahunAkademik: tahunAkademikFilter || undefined,
+                    prodi_id: (isAdministrator ? prodiFilter : storedProgramCode) || undefined,
                 }
-            }
+                const endpoints = [
+                    "/response-details/result-precentage",
+                    "/response-details/percentage-choice-value",
+                    "/response-details/precentage-choice-value",
+                ]
 
-            setAllData([])
-            setErrorMessage("Data tidak ditemukan atau endpoint persentase belum sesuai.")
-        })().finally(() => setLoading(false))
+                for (const endpoint of endpoints) {
+                    try {
+                        const res = await api.get<{ data?: PercentageItem[] }>(endpoint, { params })
+                        const rows = Array.isArray(res.data?.data)
+                            ? res.data.data
+                            : Array.isArray(res.data)
+                                ? (res.data as unknown as PercentageItem[])
+                                : []
+                        setAllData(rows)
+                        return
+                    } catch (error) {
+                        console.error(`Gagal mengambil data dari ${endpoint}`, error)
+                    }
+                }
+
+                setAllData([])
+                setErrorMessage("Data tidak ditemukan atau endpoint persentase belum sesuai.")
+            })().finally(() => setLoading(false))
     }, [hasAppliedFilter, tahunAkademikFilter, prodiFilter, isAdministrator, storedProgramCode])
 
     const selectedProdi = prodiOptions.find((item) => item.id === prodiInput)
@@ -227,9 +227,24 @@ export default function HasilAnalisisPersentasePage() {
                             {data.map((row, idx) => (
                                 <TableRow key={`${row.dosen?.Login ?? "dosen"}-${row.matakuliah?.MKID ?? "mk"}-${idx}`}>
                                     <TableCell>{row.TahunAkademik ?? "-"}</TableCell>
-                                    <TableCell>{row.prodi?.Nama ?? "-"}</TableCell>
-                                    <TableCell>{row.dosen?.Nama ?? "-"}</TableCell>
-                                    <TableCell>{row.matakuliah?.Nama ?? "-"}</TableCell>
+                                    <TableCell>
+                                        <div>{row.prodi?.ProdiID ? String(row.prodi.ProdiID) : "-"}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {row.prodi?.Nama ?? "-"}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div>{row.dosen?.Login ? String(row.dosen.Login) : "-"}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {row.dosen?.Nama ?? "-"}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div>{row.matakuliah?.MKID ? String(row.matakuliah.MKID) : "-"}</div>
+                                        <div className="text-xs text-muted-foreground max-w-xs truncate">
+                                            {row.matakuliah?.Nama ?? "-"}
+                                        </div>
+                                    </TableCell>
                                     <TableCell>{row.precentageofchoicevalue?.["1"] ?? row.percentageofchoicevalue?.["1"] ?? 0}</TableCell>
                                     <TableCell>{row.precentageofchoicevalue?.["2"] ?? row.percentageofchoicevalue?.["2"] ?? 0}</TableCell>
                                     <TableCell>{row.precentageofchoicevalue?.["3"] ?? row.percentageofchoicevalue?.["3"] ?? 0}</TableCell>
