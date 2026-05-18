@@ -272,6 +272,33 @@ export default function HasilAnalisisPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-9 w-48 justify-start">
+                            {tahunAkademikInput || "Pilih Tahun Akademik"}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Tahun Akademik</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup
+                                value={tahunAkademikInput}
+                                onValueChange={setTahunAkademikInput}
+                            >
+                                <div className="max-h-56 overflow-y-auto">
+                                    {tahunAkademikOptions.map((item) => (
+                                        <DropdownMenuRadioItem
+                                            key={item.tahunId}
+                                            value={item.tahunId}
+                                        >
+                                            {item.tahunId}
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                </div>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
                 {isAdministrator && (
                     <div className="relative w-56">
                         <Button
@@ -339,33 +366,7 @@ export default function HasilAnalisisPage() {
                     </div>
                 )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="h-9 w-48 justify-start">
-                            {tahunAkademikInput || "Pilih Tahun Akademik"}
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-48">
-                        <DropdownMenuGroup>
-                            <DropdownMenuLabel>Tahun Akademik</DropdownMenuLabel>
-                            <DropdownMenuRadioGroup
-                                value={tahunAkademikInput}
-                                onValueChange={setTahunAkademikInput}
-                            >
-                                <div className="max-h-56 overflow-y-auto">
-                                    {tahunAkademikOptions.map((item) => (
-                                        <DropdownMenuRadioItem
-                                            key={item.tahunId}
-                                            value={item.tahunId}
-                                        >
-                                            {item.tahunId}
-                                        </DropdownMenuRadioItem>
-                                    ))}
-                                </div>
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+
 
                 <div className="ml-auto flex items-center gap-3">
                     <Button

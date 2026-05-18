@@ -150,26 +150,6 @@ export default function HasilAnalisisPersentasePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                {isAdministrator && (
-                    <div className="relative w-56">
-                        <Button type="button" variant="outline" className="h-9 w-full justify-start truncate" onClick={() => setIsProdiOpen((prev) => !prev)}>
-                            {selectedProdiLabel}
-                        </Button>
-                        {isProdiOpen && (
-                            <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
-                                <Input placeholder="Cari Prodi..." value={prodiQuery} onChange={(e) => setProdiQuery(e.target.value)} className="h-8" />
-                                <div className="mt-2 max-h-56 overflow-y-auto">
-                                    {prodiOptions.map((item) => (
-                                        <button key={item.id} type="button" className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted" onClick={() => { setProdiInput(item.id); setIsProdiOpen(false) }}>
-                                            {item.id} - {item.nama}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="h-9 w-48 justify-start">
@@ -191,6 +171,27 @@ export default function HasilAnalisisPersentasePage() {
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                {isAdministrator && (
+                    <div className="relative w-56">
+                        <Button type="button" variant="outline" className="h-9 w-full justify-start truncate" onClick={() => setIsProdiOpen((prev) => !prev)}>
+                            {selectedProdiLabel}
+                        </Button>
+                        {isProdiOpen && (
+                            <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">
+                                <Input placeholder="Cari Prodi..." value={prodiQuery} onChange={(e) => setProdiQuery(e.target.value)} className="h-8" />
+                                <div className="mt-2 max-h-56 overflow-y-auto">
+                                    {prodiOptions.map((item) => (
+                                        <button key={item.id} type="button" className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted" onClick={() => { setProdiInput(item.id); setIsProdiOpen(false) }}>
+                                            {item.id} - {item.nama}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+
 
                 <div className="ml-auto flex items-center gap-3">
                     <Button disabled={!isFilterReady} onClick={() => {
