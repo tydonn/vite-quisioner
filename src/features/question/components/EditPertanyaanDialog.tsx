@@ -11,6 +11,7 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 // import {
 //     DropdownMenu,
 //     DropdownMenuContent,
@@ -117,11 +118,12 @@ export function EditPertanyaanDialog({
                 <FieldGroup>
                     <Field>
                         <Label>Pertanyaan</Label>
-                        <Input
+                        <Textarea
                             value={form.pertanyaan}
                             onChange={(e) =>
                                 setForm({ ...form, pertanyaan: e.target.value })
                             }
+                            className="min-h-24 break-words whitespace-pre-wrap"
                         />
                     </Field>
 

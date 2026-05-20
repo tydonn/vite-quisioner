@@ -21,6 +21,7 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { ChevronDownIcon } from "lucide-react"
 
 import type {
     ResponseFilterProdiOption,
@@ -229,8 +230,9 @@ export default function ResponsePage() {
             <div className="flex flex-wrap items-center gap-3">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="h-9 w-48 justify-start">
-                            {tahunAkademikInput || "Pilih Tahun Akademik"}
+                        <Button variant="outline" className="h-9 w-48 justify-between">
+                            <span className="truncate">{tahunAkademikInput || "Pilih Tahun Akademik"}</span>
+                            <ChevronDownIcon className="size-4 opacity-70" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-48">
@@ -259,13 +261,14 @@ export default function ResponsePage() {
                         <Button
                             type="button"
                             variant="outline"
-                            className="h-9 w-full justify-start truncate"
+                            className="h-9 w-full justify-between"
                             onClick={() => {
                                 setIsProdiOpen((prev) => !prev)
                             }}
                             title={selectedProdiLabel}
                         >
-                            {selectedProdiLabel}
+                            <span className="truncate">{selectedProdiLabel}</span>
+                            <ChevronDownIcon className="size-4 opacity-70" />
                         </Button>
                         {isProdiOpen && (
                             <div className="absolute z-20 mt-1 w-full rounded-md border bg-background p-2 shadow-md">

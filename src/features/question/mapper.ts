@@ -31,6 +31,18 @@ export function mapAspectToPertanyaanView(
         pertanyaan: aspect.AspectText,
         kategoriId: aspect.CategoryID,
         kategori: aspect.category?.CategoryName ?? "-",
+        activityLog: aspect.activity_log
+            ? {
+                action: aspect.activity_log.action,
+                actorName: aspect.activity_log.actor_name,
+                actorEmail: aspect.activity_log.actor_email,
+                createdAt: aspect.activity_log.created_at,
+                module: aspect.activity_log.module,
+                entityType: aspect.activity_log.entity_type,
+                entityId: aspect.activity_log.entity_id,
+                newData: aspect.activity_log.meta?.new_data,
+            }
+            : null,
         tipe: mapAnswerType(aspect.AnswerType),
         urutan: aspect.SortOrder,
         status: mapStatus(aspect.IsActive),

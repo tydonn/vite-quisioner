@@ -16,6 +16,21 @@ export interface Aspect {
     SortOrder: number
     IsActive: number
     CreatedAt: string
+    activity_log?: {
+        id: number
+        module: string
+        action: string
+        entity_type: string
+        entity_id: string
+        actor_id: number
+        actor_name: string
+        actor_email: string
+        meta?: {
+            new_data?: Record<string, unknown>
+        }
+        created_at: string
+        updated_at: string
+    }
     category?: Category
 }
 

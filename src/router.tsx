@@ -10,7 +10,6 @@ import HasilAnalisisPage from "@/pages/HasilAnalisisPage"
 import HasilAnalisisPersentasePage from "@/pages/HasilAnalisisPersentasePage"
 import LaporanPage from "@/pages/LaporanPage"
 import TindakLanjutPage from "@/pages/TindakLanjutPage"
-import BankPertanyaanTambahPage from "@/pages/BankPertanyaanTambahPage"
 import BankPertanyaanTambahKategoriPage from "@/pages/BankPertanyaanTambahKategori"
 import AuthLayout from "./components/layouts/AuthLayout"
 import DashboardLayout from "./components/layouts/DashboardLayout"
@@ -64,10 +63,6 @@ export const router = createBrowserRouter([
                     {
                         path: "bank",
                         element: <BankPertanyaanPage />,
-                    },
-                    {
-                        path: "bank/tambah-pertanyaan",
-                        element: <BankPertanyaanTambahPage />,
                     },
                     {
                         path: "bank/tambah-kategori",
