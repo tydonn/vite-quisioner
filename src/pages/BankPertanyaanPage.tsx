@@ -98,6 +98,7 @@ export default function BankPertanyaanPage() {
                             <TableHead>Tipe</TableHead>
                             <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Prodi</TableHead>
                             <TableHead>Aktivitas</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
@@ -115,6 +116,9 @@ export default function BankPertanyaanPage() {
                                     <Badge variant={item.status === "Aktif" ? "default" : "destructive"}>
                                         {item.status}
                                     </Badge>
+                                </TableCell>
+                                <TableCell className="max-w-xs whitespace-normal">
+                                    {item.prodiNama}
                                 </TableCell>
                                 <TableCell>
                                     <Button

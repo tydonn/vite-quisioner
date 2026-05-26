@@ -46,6 +46,10 @@ export function mapAspectToPertanyaanView(
         tipe: mapAnswerType(aspect.AnswerType),
         urutan: aspect.SortOrder,
         status: mapStatus(aspect.IsActive),
+        prodiNama:
+            aspect.prodis && aspect.prodis.length > 0
+                ? aspect.prodis.map((item) => item.Nama).join(", ")
+                : "-",
     }
 }
 

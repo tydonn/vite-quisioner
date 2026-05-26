@@ -24,6 +24,7 @@ export interface PertanyaanView {
     tipe: TipeJawaban
     urutan: number
     status: StatusAktif
+    prodiNama: string
 }
 
 export interface PertanyaanFilter {

@@ -31,6 +31,11 @@ export interface Aspect {
         created_at: string
         updated_at: string
     }
+    prodi_ids?: string[]
+    prodis?: Array<{
+        ProdiID: string
+        Nama: string
+    }>
     category?: Category
 }
 
