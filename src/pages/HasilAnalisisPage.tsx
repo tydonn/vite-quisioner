@@ -342,7 +342,9 @@ export default function HasilAnalisisPage() {
                                 <div className="mt-2 max-h-56 overflow-y-auto">
                                     <button
                                         type="button"
-                                        className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
+                                        className={`w-full rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground ${
+                                            prodiInput === "" ? "bg-accent text-accent-foreground" : ""
+                                        }`}
                                         onClick={() => {
                                             setProdiInput("")
                                             setIsProdiOpen(false)
@@ -354,7 +356,9 @@ export default function HasilAnalisisPage() {
                                         <button
                                             key={item.id}
                                             type="button"
-                                            className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted"
+                                            className={`w-full rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground ${
+                                                prodiInput === item.id ? "bg-accent text-accent-foreground" : ""
+                                            }`}
                                             onClick={() => {
                                                 setProdiInput(item.id)
                                                 setIsProdiOpen(false)

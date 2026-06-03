@@ -184,7 +184,14 @@ export default function HasilAnalisisPersentasePage() {
                                 <Input placeholder="Cari Prodi..." value={prodiQuery} onChange={(e) => setProdiQuery(e.target.value)} className="h-8" />
                                 <div className="mt-2 max-h-56 overflow-y-auto">
                                     {prodiOptions.map((item) => (
-                                        <button key={item.id} type="button" className="w-full rounded px-2 py-1 text-left text-sm hover:bg-muted" onClick={() => { setProdiInput(item.id); setIsProdiOpen(false) }}>
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            className={`w-full rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground ${
+                                                prodiInput === item.id ? "bg-accent text-accent-foreground" : ""
+                                            }`}
+                                            onClick={() => { setProdiInput(item.id); setIsProdiOpen(false) }}
+                                        >
                                             {item.id} - {item.nama}
                                         </button>
                                     ))}
