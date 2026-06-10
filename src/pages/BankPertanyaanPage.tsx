@@ -11,6 +11,15 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import type { PertanyaanView } from "@/features/question/view-types"
 import type { AspectListResponse } from "@/features/question/types"
@@ -21,12 +30,13 @@ import SpinnerPage from "@/pages/SpinnerPage"
 import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
 import { AddPertanyaanDialog } from "@/features/question/components/AddPertanyaanDialog"
 import { ActivityLogDialog } from "@/features/question/components/ActivityLogDialog"
-import { HistoryIcon } from "lucide-react"
+import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, HistoryIcon } from "lucide-react"
 
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [activeFilter, setActiveFilter] = useState("")
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
     const [lastPage, setLastPage] = useState(1)
@@ -41,6 +51,7 @@ export default function BankPertanyaanPage() {
                 page,
                 per_page: perPage,
                 include_total: true,
+                active: activeFilter || undefined,
             },
         })
         setData(mapAspectListToView(res.data.data))
@@ -64,7 +75,7 @@ export default function BankPertanyaanPage() {
             }
         }
         fetchData()
-    }, [page, perPage])
+    }, [page, perPage, activeFilter])
 
     const filtered = data.filter(
         (d) =>
@@ -74,6 +85,9 @@ export default function BankPertanyaanPage() {
 
     if (loading) return <SpinnerPage />
 
+    const activeFilterLabel =
+        activeFilter === "1" ? "Aktif" : activeFilter === "0" ? "Nonaktif" : "Semua Status"
+
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -81,12 +95,47 @@ export default function BankPertanyaanPage() {
                 <Button onClick={() => setOpenAdd(true)}>+ Tambah Pertanyaan</Button>
             </div>
 
-            <Input
-                placeholder="Cari pertanyaan..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-sm shadow-sm"
-            />
+            <div className="flex flex-wrap items-center gap-3">
+                <Input
+                    placeholder="Cari pertanyaan..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="max-w-sm shadow-sm"
+                />
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-9 w-44 justify-between">
+                            <span className="truncate">{activeFilterLabel}</span>
+                            <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="min-w-44">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup
+                                value={activeFilter}
+                                onValueChange={(value) => {
+                                    setActiveFilter(value)
+                                    setPage(1)
+                                }}
+                            >
+                                <DropdownMenuRadioItem value="">
+                                    Semua Status
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="1">
+                                    <CheckCircle2Icon />
+                                    Aktif
+                                </DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="0">
+                                    <CircleOffIcon />
+                                    Nonaktif
+                                </DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
 
             <div className="rounded-md border bg-background shadow-sm">
                 <Table>

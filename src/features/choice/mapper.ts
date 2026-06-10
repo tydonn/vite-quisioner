@@ -13,6 +13,7 @@ export function mapChoiceToView(choice: Choice): ChoiceView {
     return {
         id: choice.ChoiceID,
         kode: formatKode(choice.ChoiceID),
+        aspectId: choice.AspectID,
         label: choice.ChoiceLabel,
         nilai: choice.ChoiceValue,
         urutan: choice.SortOrder,
