@@ -293,19 +293,31 @@ export default function PilihanPage() {
             <div className="flex flex-col gap-3 rounded-lg border bg-background p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>Per halaman</span>
-                    <select
-                        className="rounded border px-2 py-1"
-                        value={perPage}
-                        onChange={(e) => {
-                            setPerPage(Number(e.target.value))
-                            setPage(1)
-                        }}
-                    >
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                    </select>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-20 justify-between">
+                                <span>{perPage}</span>
+                                <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="min-w-20">
+                            <DropdownMenuGroup>
+                                <DropdownMenuLabel>Per halaman</DropdownMenuLabel>
+                                <DropdownMenuRadioGroup
+                                    value={String(perPage)}
+                                    onValueChange={(value) => {
+                                        setPerPage(Number(value))
+                                        setPage(1)
+                                    }}
+                                >
+                                    <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="25">25</DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="50">50</DropdownMenuRadioItem>
+                                    <DropdownMenuRadioItem value="100">100</DropdownMenuRadioItem>
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <span>Total {total}</span>
                 </div>
 
