@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -21,7 +22,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, MoreHorizontal } from "lucide-react"
+import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, MoreHorizontal, SearchIcon } from "lucide-react"
 
 import type { ChoiceListResponse } from "@/features/choice/types"
 import type { ChoiceView } from "@/features/choice/view-types"
@@ -60,6 +61,7 @@ export default function PilihanPage() {
     const [openAdd, setOpenAdd] = useState(false)
     const [questions, setQuestions] = useState<Aspect[]>([])
     const [aspectFilter, setAspectFilter] = useState("")
+    const [questionSearch, setQuestionSearch] = useState("")
     const [activeFilter, setActiveFilter] = useState("")
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
@@ -117,18 +119,31 @@ export default function PilihanPage() {
         fetchQuestions()
     }, [])
 
-    if (loading) {
-        return <SpinnerPage />
-    }
-
     const selectedQuestion = questions.find(
         (question) => String(question.AspectID) === aspectFilter
     )
     const selectedQuestionLabel = selectedQuestion
         ? `${selectedQuestion.AspectID} - ${selectedQuestion.AspectText}`
         : "Semua Pertanyaan"
+    const filteredQuestions = useMemo(() => {
+        const keyword = questionSearch.trim().toLowerCase()
+        if (!keyword) {
+            return questions
+        }
+
+        return questions.filter((question) => {
+            const aspectId = String(question.AspectID).toLowerCase()
+            const aspectText = question.AspectText.toLowerCase()
+
+            return aspectId.includes(keyword) || aspectText.includes(keyword)
+        })
+    }, [questionSearch, questions])
     const activeFilterLabel =
         activeFilter === "1" ? "Aktif" : activeFilter === "0" ? "Nonaktif" : "Semua Status"
+
+    if (loading) {
+        return <SpinnerPage />
+    }
 
     return (
         <div className="space-y-4">
@@ -152,6 +167,18 @@ export default function PilihanPage() {
                     <DropdownMenuContent className="w-[28rem] max-w-[calc(100vw-2rem)]">
                         <DropdownMenuGroup>
                             <DropdownMenuLabel>Filter Pertanyaan</DropdownMenuLabel>
+                            <div className="px-2 pb-2">
+                                <div className="relative">
+                                    <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        value={questionSearch}
+                                        onChange={(event) => setQuestionSearch(event.target.value)}
+                                        onKeyDown={(event) => event.stopPropagation()}
+                                        placeholder="Cari pertanyaan..."
+                                        className="h-9 pl-8"
+                                    />
+                                </div>
+                            </div>
                             <DropdownMenuRadioGroup
                                 value={aspectFilter}
                                 onValueChange={(value) => {
@@ -164,7 +191,7 @@ export default function PilihanPage() {
                                         <FileQuestionIcon />
                                         Semua Pertanyaan
                                     </DropdownMenuRadioItem>
-                                    {questions.map((question) => (
+                                    {filteredQuestions.map((question) => (
                                         <DropdownMenuRadioItem
                                             key={question.AspectID}
                                             value={String(question.AspectID)}
@@ -176,6 +203,11 @@ export default function PilihanPage() {
                                             </span>
                                         </DropdownMenuRadioItem>
                                     ))}
+                                    {filteredQuestions.length === 0 ? (
+                                        <div className="px-2 py-3 text-sm text-muted-foreground">
+                                            Pertanyaan tidak ditemukan
+                                        </div>
+                                    ) : null}
                                 </div>
                             </DropdownMenuRadioGroup>
                         </DropdownMenuGroup>

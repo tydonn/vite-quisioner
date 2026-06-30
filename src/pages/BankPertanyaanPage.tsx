@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import {
     Table,
@@ -30,12 +30,13 @@ import SpinnerPage from "@/pages/SpinnerPage"
 import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
 import { AddPertanyaanDialog } from "@/features/question/components/AddPertanyaanDialog"
 import { ActivityLogDialog } from "@/features/question/components/ActivityLogDialog"
-import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, HistoryIcon } from "lucide-react"
+import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, HistoryIcon, SearchIcon } from "lucide-react"
 
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
     const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState("")
+    const [questionFilter, setQuestionFilter] = useState("")
+    const [questionSearch, setQuestionSearch] = useState("")
     const [activeFilter, setActiveFilter] = useState("")
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
@@ -77,16 +78,32 @@ export default function BankPertanyaanPage() {
         fetchData()
     }, [page, perPage, activeFilter])
 
-    const filtered = data.filter(
-        (d) =>
-            d.pertanyaan.toLowerCase().includes(search.toLowerCase()) ||
-            d.kategori.toLowerCase().includes(search.toLowerCase())
-    )
+    const filteredQuestionOptions = useMemo(() => {
+        const keyword = questionSearch.trim().toLowerCase()
+        if (!keyword) return data
 
-    if (loading) return <SpinnerPage />
+        return data.filter((item) => {
+            const id = String(item.id).toLowerCase()
+            const kode = item.kode.toLowerCase()
+            const pertanyaan = item.pertanyaan.toLowerCase()
+
+            return id.includes(keyword) || kode.includes(keyword) || pertanyaan.includes(keyword)
+        })
+    }, [data, questionSearch])
+
+    const filtered = questionFilter
+        ? data.filter((item) => String(item.id) === questionFilter)
+        : data
+
+    const selectedQuestion = data.find((item) => String(item.id) === questionFilter)
+    const selectedQuestionLabel = selectedQuestion
+        ? `${selectedQuestion.id} - ${selectedQuestion.pertanyaan}`
+        : "Semua Pertanyaan"
 
     const activeFilterLabel =
         activeFilter === "1" ? "Aktif" : activeFilter === "0" ? "Nonaktif" : "Semua Status"
+
+    if (loading) return <SpinnerPage />
 
     return (
         <div className="space-y-4">
@@ -96,12 +113,64 @@ export default function BankPertanyaanPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                <Input
-                    placeholder="Cari pertanyaan..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="max-w-sm shadow-sm"
-                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-auto min-h-9 w-80 justify-between">
+                            <span className="min-w-0 flex-1 truncate text-left">
+                                {selectedQuestionLabel}
+                            </span>
+                            <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[28rem] max-w-[calc(100vw-2rem)]">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Filter Pertanyaan</DropdownMenuLabel>
+                            <div className="px-2 pb-2">
+                                <div className="relative">
+                                    <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        value={questionSearch}
+                                        onChange={(event) => setQuestionSearch(event.target.value)}
+                                        onKeyDown={(event) => event.stopPropagation()}
+                                        placeholder="Cari pertanyaan..."
+                                        className="h-9 pl-8"
+                                    />
+                                </div>
+                            </div>
+                            <DropdownMenuRadioGroup
+                                value={questionFilter}
+                                onValueChange={(value) => {
+                                    setQuestionFilter(value)
+                                    setPage(1)
+                                }}
+                            >
+                                <div className="max-h-56 overflow-y-auto">
+                                    <DropdownMenuRadioItem value="">
+                                        <FileQuestionIcon />
+                                        Semua Pertanyaan
+                                    </DropdownMenuRadioItem>
+                                    {filteredQuestionOptions.map((item) => (
+                                        <DropdownMenuRadioItem
+                                            key={item.id}
+                                            value={String(item.id)}
+                                            className="items-start"
+                                        >
+                                            <FileQuestionIcon />
+                                            <span className="whitespace-normal break-words leading-snug">
+                                                {item.id} - {item.pertanyaan}
+                                            </span>
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                    {filteredQuestionOptions.length === 0 ? (
+                                        <div className="px-2 py-3 text-sm text-muted-foreground">
+                                            Pertanyaan tidak ditemukan
+                                        </div>
+                                    ) : null}
+                                </div>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
