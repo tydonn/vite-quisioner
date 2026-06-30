@@ -34,6 +34,7 @@ import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, His
 
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
+    const [questionOptions, setQuestionOptions] = useState<PertanyaanView[]>([])
     const [loading, setLoading] = useState(true)
     const [questionFilter, setQuestionFilter] = useState("")
     const [questionSearch, setQuestionSearch] = useState("")
@@ -64,11 +65,46 @@ export default function BankPertanyaanPage() {
         }
     }
 
+    async function refreshQuestionOptions() {
+        const firstPage = await api.get<AspectListResponse>("/questions", {
+            params: {
+                page: 1,
+                per_page: 500,
+                include_total: true,
+            },
+        })
+
+        const firstPageItems = mapAspectListToView(firstPage.data.data)
+        const totalPages = firstPage.data.pagination.last_page ?? 1
+
+        if (totalPages <= 1) {
+            setQuestionOptions(firstPageItems)
+            return
+        }
+
+        const remainingPages = await Promise.all(
+            Array.from({ length: totalPages - 1 }, (_, index) =>
+                api.get<AspectListResponse>("/questions", {
+                    params: {
+                        page: index + 2,
+                        per_page: 500,
+                        include_total: true,
+                    },
+                })
+            )
+        )
+
+        setQuestionOptions([
+            ...firstPageItems,
+            ...remainingPages.flatMap((res) => mapAspectListToView(res.data.data)),
+        ])
+    }
+
     useEffect(() => {
         async function fetchData() {
             setLoading(true)
             try {
-                await refreshData()
+                await Promise.all([refreshData(), refreshQuestionOptions()])
             } catch (error) {
                 console.error("Gagal mengambil data pertanyaan", error)
             } finally {
@@ -80,22 +116,22 @@ export default function BankPertanyaanPage() {
 
     const filteredQuestionOptions = useMemo(() => {
         const keyword = questionSearch.trim().toLowerCase()
-        if (!keyword) return data
+        if (!keyword) return questionOptions
 
-        return data.filter((item) => {
+        return questionOptions.filter((item) => {
             const id = String(item.id).toLowerCase()
             const kode = item.kode.toLowerCase()
             const pertanyaan = item.pertanyaan.toLowerCase()
 
             return id.includes(keyword) || kode.includes(keyword) || pertanyaan.includes(keyword)
         })
-    }, [data, questionSearch])
+    }, [questionOptions, questionSearch])
 
     const filtered = questionFilter
-        ? data.filter((item) => String(item.id) === questionFilter)
+        ? questionOptions.filter((item) => String(item.id) === questionFilter)
         : data
 
-    const selectedQuestion = data.find((item) => String(item.id) === questionFilter)
+    const selectedQuestion = questionOptions.find((item) => String(item.id) === questionFilter)
     const selectedQuestionLabel = selectedQuestion
         ? `${selectedQuestion.id} - ${selectedQuestion.pertanyaan}`
         : "Semua Pertanyaan"
@@ -314,12 +350,16 @@ export default function BankPertanyaanPage() {
                     open={!!selected}
                     data={selected}
                     onClose={() => setSelected(null)}
-                    onSuccess={refreshData}
+                    onSuccess={async () => {
+                        await Promise.all([refreshData(), refreshQuestionOptions()])
+                    }}
                 />
                 <AddPertanyaanDialog
                     open={openAdd}
                     onClose={() => setOpenAdd(false)}
-                    onSuccess={refreshData}
+                    onSuccess={async () => {
+                        await Promise.all([refreshData(), refreshQuestionOptions()])
+                    }}
                 />
                 <ActivityLogDialog
                     open={!!selectedActivity}
