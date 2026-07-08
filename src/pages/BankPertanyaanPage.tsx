@@ -250,6 +250,7 @@ export default function BankPertanyaanPage() {
                             <TableHead>Pertanyaan</TableHead>
                             <TableHead>Kategori</TableHead>
                             <TableHead>Tipe</TableHead>
+                            <TableHead>Responden</TableHead>
                             <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Prodi</TableHead>
@@ -265,6 +266,7 @@ export default function BankPertanyaanPage() {
                                 <TableCell className="max-w-sm truncate">{item.pertanyaan}</TableCell>
                                 <TableCell>{item.kategori}</TableCell>
                                 <TableCell>{item.tipe}</TableCell>
+                                <TableCell>{item.responden}</TableCell>
                                 <TableCell>{item.urutan}</TableCell>
                                 <TableCell>
                                     <Badge variant={item.status === "Aktif" ? "default" : "destructive"}>
@@ -295,35 +297,35 @@ export default function BankPertanyaanPage() {
                 </Table>
 
                 <div className="flex flex-col gap-3 border-t p-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Per halaman</span>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 w-20 justify-between">
-                                <span>{perPage}</span>
-                                <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="min-w-20">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Per halaman</DropdownMenuLabel>
-                                <DropdownMenuRadioGroup
-                                    value={String(perPage)}
-                                    onValueChange={(value) => {
-                                        setPerPage(Number(value))
-                                        setPage(1)
-                                    }}
-                                >
-                                    <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
-                                    <DropdownMenuRadioItem value="25">25</DropdownMenuRadioItem>
-                                    <DropdownMenuRadioItem value="50">50</DropdownMenuRadioItem>
-                                    <DropdownMenuRadioItem value="100">100</DropdownMenuRadioItem>
-                                </DropdownMenuRadioGroup>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <span>Total {total}</span>
-                </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>Per halaman</span>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 w-20 justify-between">
+                                    <span>{perPage}</span>
+                                    <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="min-w-20">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuLabel>Per halaman</DropdownMenuLabel>
+                                    <DropdownMenuRadioGroup
+                                        value={String(perPage)}
+                                        onValueChange={(value) => {
+                                            setPerPage(Number(value))
+                                            setPage(1)
+                                        }}
+                                    >
+                                        <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
+                                        <DropdownMenuRadioItem value="25">25</DropdownMenuRadioItem>
+                                        <DropdownMenuRadioItem value="50">50</DropdownMenuRadioItem>
+                                        <DropdownMenuRadioItem value="100">100</DropdownMenuRadioItem>
+                                    </DropdownMenuRadioGroup>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <span>Total {total}</span>
+                    </div>
 
                     <div className="flex items-center gap-2">
                         <Button

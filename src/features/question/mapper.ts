@@ -44,6 +44,8 @@ export function mapAspectToPertanyaanView(
             }
             : null,
         tipe: mapAnswerType(aspect.AnswerType),
+        respondenId: aspect.RespondentID === null ? null : String(aspect.RespondentID),
+        responden: aspect.respondent?.RespondentName ?? null,
         urutan: aspect.SortOrder,
         status: mapStatus(aspect.IsActive),
         prodiNama:

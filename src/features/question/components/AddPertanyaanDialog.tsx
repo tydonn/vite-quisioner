@@ -24,6 +24,7 @@ import {
 
 import api from "@/lib/api"
 import type { Category } from "@/features/category/types"
+import type { Respondent, RespondentListResponse } from "@/features/question/types"
 
 type Props = {
     open: boolean
@@ -34,8 +35,10 @@ type Props = {
 export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
     const [addLoading, setAddLoading] = useState(false)
     const [categories, setCategories] = useState<Category[]>([])
+    const [respondents, setRespondents] = useState<Respondent[]>([])
     const [newQuestion, setNewQuestion] = useState({
         categoryId: "",
+        respondentId: "",
         aspectText: "",
         answerType: "CHOICE" as "CHOICE" | "TEXT" | "LIKERT",
         sortOrder: 1,
@@ -44,22 +47,37 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
 
     useEffect(() => {
         if (!open) return
-        async function fetchCategories() {
+        async function fetchOptions() {
             try {
-                const res = await api.get<{ data: Category[] }>("/categories")
-                setCategories(res.data.data ?? [])
-                if ((res.data.data ?? []).length > 0 && !newQuestion.categoryId) {
+                const [categoryRes, respondentRes] = await Promise.all([
+                    api.get<{ data: Category[] }>("/categories"),
+                    api.get<RespondentListResponse>("/respondents"),
+                ])
+
+                const categoryData = categoryRes.data.data ?? []
+                const respondentData = respondentRes.data.data ?? []
+
+                setCategories(categoryData)
+                setRespondents(respondentData)
+
+                if (categoryData.length > 0) {
                     setNewQuestion((prev) => ({
                         ...prev,
-                        categoryId: String(res.data.data[0].CategoryID),
+                        categoryId: prev.categoryId || String(categoryData[0].CategoryID),
+                    }))
+                }
+                if (respondentData.length > 0) {
+                    setNewQuestion((prev) => ({
+                        ...prev,
+                        respondentId: prev.respondentId || String(respondentData[0].RespondentID),
                     }))
                 }
             } catch (error) {
-                console.error("Gagal mengambil kategori", error)
+                console.error("Gagal mengambil opsi pertanyaan", error)
             }
         }
-        fetchCategories()
-    }, [open, newQuestion.categoryId])
+        fetchOptions()
+    }, [open])
 
     async function handleAddQuestion(e: React.FormEvent) {
         e.preventDefault()
@@ -68,6 +86,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
         try {
             await api.post("/questions", {
                 CategoryID: Number(newQuestion.categoryId),
+                RespondentID: newQuestion.respondentId ? Number(newQuestion.respondentId) : null,
                 AspectText: newQuestion.aspectText.trim(),
                 AnswerType: newQuestion.answerType,
                 ChoiceTypeID: null,
@@ -78,6 +97,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
             onClose()
             setNewQuestion({
                 categoryId: "",
+                respondentId: "",
                 aspectText: "",
                 answerType: "CHOICE",
                 sortOrder: 1,
@@ -149,6 +169,42 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                     </div>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
+                            <Label>Responden</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-between">
+                                        <span className="truncate">
+                                            {respondents.find((item) => String(item.RespondentID) === newQuestion.respondentId)?.RespondentName ?? "Pilih responden"}
+                                        </span>
+                                        <ChevronDownIcon className="size-4 opacity-70" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="min-w-56">
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuLabel>Pilih Responden</DropdownMenuLabel>
+                                        <DropdownMenuRadioGroup
+                                            value={newQuestion.respondentId}
+                                            onValueChange={(value) =>
+                                                setNewQuestion((prev) => ({ ...prev, respondentId: value }))
+                                            }
+                                        >
+                                            <div className="max-h-56 overflow-y-auto">
+                                                {respondents.map((respondent) => (
+                                                    <DropdownMenuRadioItem
+                                                        key={respondent.RespondentID}
+                                                        value={String(respondent.RespondentID)}
+                                                    >
+                                                        <ListIcon />
+                                                        {respondent.RespondentName}
+                                                    </DropdownMenuRadioItem>
+                                                ))}
+                                            </div>
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                        <div className="space-y-2">
                             <Label>Tipe Jawaban</Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -197,38 +253,39 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                                 }
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label>Status</Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full justify-between">
+                                        <span>{newQuestion.isActive ? "Aktif" : "Nonaktif"}</span>
+                                        <ChevronDownIcon className="size-4 opacity-70" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="min-w-56">
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuLabel>Pilih Status</DropdownMenuLabel>
+                                        <DropdownMenuRadioGroup
+                                            value={newQuestion.isActive ? "1" : "0"}
+                                            onValueChange={(value) =>
+                                                setNewQuestion((prev) => ({ ...prev, isActive: value === "1" }))
+                                            }
+                                        >
+                                            <DropdownMenuRadioItem value="1">
+                                                <CheckCircle2Icon />
+                                                Aktif
+                                            </DropdownMenuRadioItem>
+                                            <DropdownMenuRadioItem value="0">
+                                                <CircleOffIcon />
+                                                Nonaktif
+                                            </DropdownMenuRadioItem>
+                                        </DropdownMenuRadioGroup>
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label>Status</Label>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-between">
-                                    <span>{newQuestion.isActive ? "Aktif" : "Nonaktif"}</span>
-                                    <ChevronDownIcon className="size-4 opacity-70" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="min-w-56">
-                                <DropdownMenuGroup>
-                                    <DropdownMenuLabel>Pilih Status</DropdownMenuLabel>
-                                    <DropdownMenuRadioGroup
-                                        value={newQuestion.isActive ? "1" : "0"}
-                                        onValueChange={(value) =>
-                                            setNewQuestion((prev) => ({ ...prev, isActive: value === "1" }))
-                                        }
-                                    >
-                                        <DropdownMenuRadioItem value="1">
-                                            <CheckCircle2Icon />
-                                            Aktif
-                                        </DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="0">
-                                            <CircleOffIcon />
-                                            Nonaktif
-                                        </DropdownMenuRadioItem>
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={onClose}>
                             Batal
@@ -242,4 +299,3 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
         </Dialog>
     )
 }
-

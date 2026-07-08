@@ -1,17 +1,15 @@
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
 import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,63 +19,51 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Field, FieldGroup } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 import api from "@/lib/api"
-import { useEffect, useState } from "react"
-import type { KategoriView } from "@/features/category/view-types"
 
 type Props = {
     open: boolean
-    data: KategoriView | null
     onClose: () => void
-    onSuccess: () => void
+    onSuccess: () => Promise<void> | void
 }
 
-export function EditCategoryDialog({
-    open,
-    data,
-    onClose,
-    onSuccess,
-}: Props) {
-    const [form, setForm] = useState<KategoriView | null>(data)
+export function AddCategoryDialog({ open, onClose, onSuccess }: Props) {
     const [loading, setLoading] = useState(false)
-
-    useEffect(() => {
-        if (data) {
-            setForm(data)
-        }
-    }, [data?.id])
-
-    if (!form) return null
+    const [form, setForm] = useState({
+        nama: "",
+        deskripsi: "",
+        urutan: 1,
+        status: "Aktif" as "Aktif" | "Nonaktif",
+    })
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
-
-        if (!form) return
+        if (!form.nama.trim()) return
 
         setLoading(true)
 
-        const payload = {
-            CategoryID: form.id,
-            CategoryName: form.nama,
-            Description: form.deskripsi,
-            SortOrder: form.urutan,
-            IsActive: form.status === "Aktif" ? 1 : 0,
-        }
-
         try {
-            await api.put(`/categories/${form.id}`, payload)
+            await api.post("/categories", {
+                CategoryName: form.nama.trim(),
+                Description: form.deskripsi.trim(),
+                SortOrder: Number(form.urutan),
+                IsActive: form.status === "Aktif" ? 1 : 0,
+            })
 
-            onSuccess()
+            await onSuccess()
             onClose()
-        } catch (err) {
-            console.error("Gagal update kategori", err)
-            console.error("Payload update kategori", payload)
-            const error = err as {
-                response?: { status?: number; data?: unknown }
-            }
-            console.error("Response status", error.response?.status)
-            console.error("Response data", error.response?.data)
+            setForm({
+                nama: "",
+                deskripsi: "",
+                urutan: 1,
+                status: "Aktif",
+            })
+        } catch (error) {
+            console.error("Gagal menambah kategori", error)
         } finally {
             setLoading(false)
         }
@@ -87,9 +73,9 @@ export function EditCategoryDialog({
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                    <DialogTitle>Edit Kategori</DialogTitle>
+                    <DialogTitle>Tambah Kategori</DialogTitle>
                     <DialogDescription>
-                        Buat perubahan pada kategori di sini. Klik simpan ketika Anda selesai.
+                        Tambahkan kategori pertanyaan baru. Klik simpan ketika data sudah sesuai.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -100,8 +86,10 @@ export function EditCategoryDialog({
                             <Input
                                 value={form.nama}
                                 onChange={(e) =>
-                                    setForm({ ...form, nama: e.target.value })
+                                    setForm((prev) => ({ ...prev, nama: e.target.value }))
                                 }
+                                placeholder="Masukkan nama kategori"
+                                required
                             />
                         </Field>
 
@@ -110,8 +98,9 @@ export function EditCategoryDialog({
                             <Input
                                 value={form.deskripsi}
                                 onChange={(e) =>
-                                    setForm({ ...form, deskripsi: e.target.value })
+                                    setForm((prev) => ({ ...prev, deskripsi: e.target.value }))
                                 }
+                                placeholder="Masukkan deskripsi kategori"
                             />
                         </Field>
 
@@ -120,12 +109,13 @@ export function EditCategoryDialog({
                                 <Label>Urutan</Label>
                                 <Input
                                     type="number"
+                                    min={1}
                                     value={form.urutan}
                                     onChange={(e) =>
-                                        setForm({
-                                            ...form,
+                                        setForm((prev) => ({
+                                            ...prev,
                                             urutan: Number(e.target.value),
-                                        })
+                                        }))
                                     }
                                 />
                             </Field>
@@ -145,10 +135,10 @@ export function EditCategoryDialog({
                                             <DropdownMenuRadioGroup
                                                 value={form.status}
                                                 onValueChange={(value) =>
-                                                    setForm({
-                                                        ...form,
+                                                    setForm((prev) => ({
+                                                        ...prev,
                                                         status: value as "Aktif" | "Nonaktif",
-                                                    })
+                                                    }))
                                                 }
                                             >
                                                 <DropdownMenuRadioItem value="Aktif">
@@ -168,12 +158,9 @@ export function EditCategoryDialog({
                     </FieldGroup>
 
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Batal
-                            </Button>
-                        </DialogClose>
-
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Batal
+                        </Button>
                         <Button type="submit" disabled={loading}>
                             {loading ? "Menyimpan..." : "Simpan"}
                         </Button>

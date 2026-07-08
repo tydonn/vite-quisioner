@@ -12,6 +12,7 @@ export interface Aspect {
     CategoryID: number
     AspectText: string
     AnswerType: "CHOICE" | "TEXT" | "LIKERT"
+    RespondentID: number | string | null
     ChoiceTypeID: number | null
     SortOrder: number
     IsActive: number
@@ -37,6 +38,21 @@ export interface Aspect {
         Nama: string
     }>
     category?: Category
+    respondent?: {
+        RespondentID: number | string
+        RespondentName: string
+    }
+}
+
+export interface Respondent {
+    RespondentID: number
+    RespondentName: string
+    LevelID: string
+}
+
+export interface RespondentListResponse {
+    success: boolean
+    data: Respondent[]
 }
 
 export interface AspectResponse {

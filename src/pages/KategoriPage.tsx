@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,6 +28,7 @@ import type { CategoryListResponse } from "@/features/category/types"
 import type { KategoriView } from "@/features/category/view-types"
 import { mapCategoryListToView } from "@/features/category/mapper"
 import { EditCategoryDialog } from "@/features/category/components/EditCategoryDialog"
+import { AddCategoryDialog } from "@/features/category/components/AddCategoryDialog"
 
 import api from "@/lib/api"
 import SpinnerPage from "@/pages/SpinnerPage"
@@ -37,30 +37,36 @@ export default function KategoriPage() {
     const [data, setData] = useState<KategoriView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
+    const [openAdd, setOpenAdd] = useState(false)
     const [selected, setSelected] = useState<KategoriView | null>(null)
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
     const [lastPage, setLastPage] = useState(1)
     const [total, setTotal] = useState(0)
 
+    async function refreshData() {
+        const res = await api.get<CategoryListResponse>("/categories", {
+            params: {
+                page,
+                per_page: perPage,
+                include_total: true,
+            },
+        })
+        const mapped = mapCategoryListToView(res.data.data)
+        setData(mapped)
+        if (res.data.pagination.last_page !== null) {
+            setLastPage(res.data.pagination.last_page)
+        }
+        if (res.data.pagination.total !== null) {
+            setTotal(res.data.pagination.total)
+        }
+    }
+
     useEffect(() => {
         async function fetchData() {
+            setLoading(true)
             try {
-                const res = await api.get<CategoryListResponse>("/categories", {
-                    params: {
-                        page,
-                        per_page: perPage,
-                        include_total: true,
-                    },
-                })
-                const mapped = mapCategoryListToView(res.data.data)
-                setData(mapped)
-                if (res.data.pagination.last_page !== null) {
-                    setLastPage(res.data.pagination.last_page)
-                }
-                if (res.data.pagination.total !== null) {
-                    setTotal(res.data.pagination.total)
-                }
+                await refreshData()
             } catch (error) {
                 console.error("Gagal mengambil data kategori", error)
             } finally {
@@ -86,10 +92,8 @@ export default function KategoriPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Kategori Pertanyaan</h1>
-                <Button asChild>
-                    <Link to="/bank/tambah-kategori">
-                        + Tambah Kategori
-                    </Link>
+                <Button onClick={() => setOpenAdd(true)}>
+                    + Tambah Kategori
                 </Button>
             </div>
 
@@ -227,22 +231,12 @@ export default function KategoriPage() {
                 open={!!selected}
                 data={selected}
                 onClose={() => setSelected(null)}
-                onSuccess={async () => {
-                    const res = await api.get<CategoryListResponse>("/categories", {
-                        params: {
-                            page,
-                            per_page: perPage,
-                            include_total: true,
-                        },
-                    })
-                    setData(mapCategoryListToView(res.data.data))
-                    if (res.data.pagination.last_page !== null) {
-                        setLastPage(res.data.pagination.last_page)
-                    }
-                    if (res.data.pagination.total !== null) {
-                        setTotal(res.data.pagination.total)
-                    }
-                }}
+                onSuccess={refreshData}
+            />
+            <AddCategoryDialog
+                open={openAdd}
+                onClose={() => setOpenAdd(false)}
+                onSuccess={refreshData}
             />
         </div>
     )

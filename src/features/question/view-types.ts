@@ -22,6 +22,8 @@ export interface PertanyaanView {
         newData?: Record<string, unknown>
     } | null
     tipe: TipeJawaban
+    respondenId: string | null
+    responden: string | null
     urutan: number
     status: StatusAktif
     prodiNama: string
