@@ -81,12 +81,13 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
 
     async function handleAddQuestion(e: React.FormEvent) {
         e.preventDefault()
-        if (!newQuestion.categoryId || !newQuestion.aspectText.trim()) return
+        if (!newQuestion.categoryId || !newQuestion.respondentId || !newQuestion.aspectText.trim()) return
         setAddLoading(true)
+        const respondentId = Number(newQuestion.respondentId)
         try {
             await api.post("/questions", {
                 CategoryID: Number(newQuestion.categoryId),
-                RespondentID: newQuestion.respondentId ? Number(newQuestion.respondentId) : null,
+                RespondentID: respondentId,
                 AspectText: newQuestion.aspectText.trim(),
                 AnswerType: newQuestion.answerType,
                 ChoiceTypeID: null,
@@ -135,7 +136,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                         <Label>Kategori</Label>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full justify-between">
+                                <Button type="button" variant="outline" className="w-full justify-between">
                                     <span className="truncate">
                                         {categories.find((c) => String(c.CategoryID) === newQuestion.categoryId)?.CategoryName ?? "Pilih kategori"}
                                     </span>
@@ -172,7 +173,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                             <Label>Responden</Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-between">
+                                    <Button type="button" variant="outline" className="w-full justify-between">
                                         <span className="truncate">
                                             {respondents.find((item) => String(item.RespondentID) === newQuestion.respondentId)?.RespondentName ?? "Pilih responden"}
                                         </span>
@@ -208,7 +209,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                             <Label>Tipe Jawaban</Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-between">
+                                    <Button type="button" variant="outline" className="w-full justify-between">
                                         <span>{newQuestion.answerType}</span>
                                         <ChevronDownIcon className="size-4 opacity-70" />
                                     </Button>
@@ -257,7 +258,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                             <Label>Status</Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-between">
+                                    <Button type="button" variant="outline" className="w-full justify-between">
                                         <span>{newQuestion.isActive ? "Aktif" : "Nonaktif"}</span>
                                         <ChevronDownIcon className="size-4 opacity-70" />
                                     </Button>

@@ -150,7 +150,7 @@ export function EditPertanyaanDialog({
                             <Label>Kategori</Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full justify-between">
+                                    <Button type="button" variant="outline" className="w-full justify-between">
                                         <span className="truncate">{selectedCategoryLabel}</span>
                                         <ChevronDownIcon className="size-4 opacity-70" />
                                     </Button>
@@ -189,7 +189,7 @@ export function EditPertanyaanDialog({
                                 <Label>Responden</Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-between">
+                                        <Button type="button" variant="outline" className="w-full justify-between">
                                             <span className="truncate">{selectedRespondentLabel}</span>
                                             <ChevronDownIcon className="size-4 opacity-70" />
                                         </Button>
@@ -227,7 +227,7 @@ export function EditPertanyaanDialog({
                                 <Label>Tipe Jawaban</Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-between">
+                                        <Button type="button" variant="outline" className="w-full justify-between">
                                             <span>{mapTipeToAnswerType(form.tipe)}</span>
                                             <ChevronDownIcon className="size-4 opacity-70" />
                                         </Button>
@@ -287,7 +287,7 @@ export function EditPertanyaanDialog({
                                 <Label>Status</Label>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-between">
+                                        <Button type="button" variant="outline" className="w-full justify-between">
                                             <span>{form.status}</span>
                                             <ChevronDownIcon className="size-4 opacity-70" />
                                         </Button>
