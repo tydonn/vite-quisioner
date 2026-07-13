@@ -32,3 +32,7 @@ export interface PertanyaanView {
 export interface PertanyaanFilter {
     search: string
 }
+
+export interface RespondenFilter {
+    search: string
+}

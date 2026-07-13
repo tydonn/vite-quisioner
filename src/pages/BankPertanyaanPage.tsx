@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import type { PertanyaanView } from "@/features/question/view-types"
-import type { AspectListResponse } from "@/features/question/types"
+import type { AspectListResponse, Respondent, RespondentListResponse } from "@/features/question/types"
 import { mapAspectListToView } from "@/features/question/mapper"
 
 import api from "@/lib/api"
@@ -30,14 +30,16 @@ import SpinnerPage from "@/pages/SpinnerPage"
 import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
 import { AddPertanyaanDialog } from "@/features/question/components/AddPertanyaanDialog"
 import { ActivityLogDialog } from "@/features/question/components/ActivityLogDialog"
-import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, HistoryIcon, SearchIcon } from "lucide-react"
+import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, HistoryIcon, SearchIcon, UsersIcon } from "lucide-react"
 
 export default function BankPertanyaanPage() {
     const [data, setData] = useState<PertanyaanView[]>([])
     const [questionOptions, setQuestionOptions] = useState<PertanyaanView[]>([])
+    const [respondents, setRespondents] = useState<Respondent[]>([])
     const [loading, setLoading] = useState(true)
     const [questionFilter, setQuestionFilter] = useState("")
     const [questionSearch, setQuestionSearch] = useState("")
+    const [respondentFilter, setRespondentFilter] = useState("")
     const [activeFilter, setActiveFilter] = useState("")
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
@@ -53,6 +55,7 @@ export default function BankPertanyaanPage() {
                 page,
                 per_page: perPage,
                 include_total: true,
+                respondent_id: respondentFilter || undefined,
                 active: activeFilter || undefined,
             },
         })
@@ -100,11 +103,16 @@ export default function BankPertanyaanPage() {
         ])
     }
 
+    async function refreshRespondents() {
+        const res = await api.get<RespondentListResponse>("/respondents")
+        setRespondents(res.data.data ?? [])
+    }
+
     useEffect(() => {
         async function fetchData() {
             setLoading(true)
             try {
-                await Promise.all([refreshData(), refreshQuestionOptions()])
+                await Promise.all([refreshData(), refreshQuestionOptions(), refreshRespondents()])
             } catch (error) {
                 console.error("Gagal mengambil data pertanyaan", error)
             } finally {
@@ -112,7 +120,7 @@ export default function BankPertanyaanPage() {
             }
         }
         fetchData()
-    }, [page, perPage, activeFilter])
+    }, [page, perPage, respondentFilter, activeFilter])
 
     const filteredQuestionOptions = useMemo(() => {
         const keyword = questionSearch.trim().toLowerCase()
@@ -128,13 +136,28 @@ export default function BankPertanyaanPage() {
     }, [questionOptions, questionSearch])
 
     const filtered = questionFilter
-        ? questionOptions.filter((item) => String(item.id) === questionFilter)
+        ? questionOptions.filter((item) => {
+            const matchQuestion = String(item.id) === questionFilter
+            const matchRespondent = respondentFilter
+                ? String(item.respondenId) === respondentFilter
+                : true
+            const matchActive = activeFilter
+                ? (activeFilter === "1" ? item.status === "Aktif" : item.status === "Nonaktif")
+                : true
+
+            return matchQuestion && matchRespondent && matchActive
+        })
         : data
 
     const selectedQuestion = questionOptions.find((item) => String(item.id) === questionFilter)
     const selectedQuestionLabel = selectedQuestion
         ? `${selectedQuestion.id} - ${selectedQuestion.pertanyaan}`
         : "Semua Pertanyaan"
+
+    const selectedRespondent = respondents.find(
+        (respondent) => String(respondent.RespondentID) === respondentFilter
+    )
+    const respondentFilterLabel = selectedRespondent?.RespondentName ?? "Semua Responden"
 
     const activeFilterLabel =
         activeFilter === "1" ? "Aktif" : activeFilter === "0" ? "Nonaktif" : "Semua Status"
@@ -203,6 +226,41 @@ export default function BankPertanyaanPage() {
                                         </div>
                                     ) : null}
                                 </div>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-9 w-52 justify-between">
+                            <span className="truncate">{respondentFilterLabel}</span>
+                            <ChevronDownIcon className="size-4 shrink-0 opacity-70" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="min-w-52">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Filter Responden</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup
+                                value={respondentFilter}
+                                onValueChange={(value) => {
+                                    setRespondentFilter(value)
+                                    setPage(1)
+                                }}
+                            >
+                                <DropdownMenuRadioItem value="">
+                                    <UsersIcon />
+                                    Semua Responden
+                                </DropdownMenuRadioItem>
+                                {respondents.map((respondent) => (
+                                    <DropdownMenuRadioItem
+                                        key={respondent.RespondentID}
+                                        value={String(respondent.RespondentID)}
+                                    >
+                                        <UsersIcon />
+                                        {respondent.RespondentName}
+                                    </DropdownMenuRadioItem>
+                                ))}
                             </DropdownMenuRadioGroup>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
