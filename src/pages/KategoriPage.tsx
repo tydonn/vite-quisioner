@@ -32,8 +32,10 @@ import { AddCategoryDialog } from "@/features/category/components/AddCategoryDia
 
 import api from "@/lib/api"
 import SpinnerPage from "@/pages/SpinnerPage"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function KategoriPage() {
+    const { isAdministrator } = useAuth()
     const [data, setData] = useState<KategoriView[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState("")
@@ -92,7 +94,11 @@ export default function KategoriPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Kategori Pertanyaan</h1>
-                <Button onClick={() => setOpenAdd(true)}>
+                <Button
+                    onClick={() => setOpenAdd(true)}
+                    disabled={!isAdministrator}
+                    title={!isAdministrator ? "Hanya administrator yang dapat menambah kategori" : undefined}
+                >
                     + Tambah Kategori
                 </Button>
             </div>
@@ -156,7 +162,10 @@ export default function KategoriPage() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => setSelected(row)}>
+                                            <DropdownMenuItem
+                                                disabled={!isAdministrator}
+                                                onClick={() => setSelected(row)}
+                                            >
                                                 Edit
                                             </DropdownMenuItem>
                                             {/* <DropdownMenuItem className="text-destructive">

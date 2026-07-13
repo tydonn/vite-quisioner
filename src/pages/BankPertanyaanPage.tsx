@@ -27,12 +27,14 @@ import { mapAspectListToView } from "@/features/question/mapper"
 
 import api from "@/lib/api"
 import SpinnerPage from "@/pages/SpinnerPage"
+import { useAuth } from "@/contexts/AuthContext"
 import { EditPertanyaanDialog } from "@/features/question/components/EditPertanyaanDialog"
 import { AddPertanyaanDialog } from "@/features/question/components/AddPertanyaanDialog"
 import { ActivityLogDialog } from "@/features/question/components/ActivityLogDialog"
 import { CheckCircle2Icon, ChevronDownIcon, CircleOffIcon, FileQuestionIcon, HistoryIcon, SearchIcon, UsersIcon } from "lucide-react"
 
 export default function BankPertanyaanPage() {
+    const { isAdministrator } = useAuth()
     const [data, setData] = useState<PertanyaanView[]>([])
     const [questionOptions, setQuestionOptions] = useState<PertanyaanView[]>([])
     const [respondents, setRespondents] = useState<Respondent[]>([])
@@ -168,7 +170,13 @@ export default function BankPertanyaanPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Bank Pertanyaan</h1>
-                <Button onClick={() => setOpenAdd(true)}>+ Tambah Pertanyaan</Button>
+                <Button
+                    onClick={() => setOpenAdd(true)}
+                    disabled={!isAdministrator}
+                    title={!isAdministrator ? "Hanya administrator yang dapat menambah pertanyaan" : undefined}
+                >
+                    + Tambah Pertanyaan
+                </Button>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -345,7 +353,13 @@ export default function BankPertanyaanPage() {
                                     </Button>
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline" onClick={() => setSelected(item)}>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setSelected(item)}
+                                        disabled={!isAdministrator}
+                                        title={!isAdministrator ? "Hanya administrator yang dapat mengedit pertanyaan" : undefined}
+                                    >
                                         Edit
                                     </Button>
                                 </TableCell>

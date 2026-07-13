@@ -187,9 +187,8 @@ export default function HasilAnalisisPersentasePage() {
                                         <button
                                             key={item.id}
                                             type="button"
-                                            className={`w-full rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground ${
-                                                prodiInput === item.id ? "bg-accent text-accent-foreground" : ""
-                                            }`}
+                                            className={`w-full rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground ${prodiInput === item.id ? "bg-accent text-accent-foreground" : ""
+                                                }`}
                                             onClick={() => { setProdiInput(item.id); setIsProdiOpen(false) }}
                                         >
                                             {item.id} - {item.nama}
@@ -228,10 +227,10 @@ export default function HasilAnalisisPersentasePage() {
                                 <TableHead>Prodi</TableHead>
                                 <TableHead>Dosen</TableHead>
                                 <TableHead>Matakuliah</TableHead>
-                                <TableHead>Value 1 (%)</TableHead>
-                                <TableHead>Value 2 (%)</TableHead>
-                                <TableHead>Value 3 (%)</TableHead>
-                                <TableHead>Value 4 (%)</TableHead>
+                                <TableHead>Tidak Puas (%)</TableHead>
+                                <TableHead>Kurang Puas (%)</TableHead>
+                                <TableHead>Puas (%)</TableHead>
+                                <TableHead>Sangat Puas (%)</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

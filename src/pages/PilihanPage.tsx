@@ -32,6 +32,7 @@ import { AddChoiceDialog } from "@/features/choice/components/AddChoiceDialog"
 import type { Aspect } from "@/features/question/types"
 import api from "@/lib/api"
 import SpinnerPage from "@/pages/SpinnerPage"
+import { useAuth } from "@/contexts/AuthContext"
 
 function getLabelClassName(value: string) {
     const normalized = value.toLowerCase()
@@ -55,6 +56,7 @@ function getLabelClassName(value: string) {
 }
 
 export default function PilihanPage() {
+    const { isAdministrator } = useAuth()
     const [data, setData] = useState<ChoiceView[]>([])
     const [loading, setLoading] = useState(true)
     const [selected, setSelected] = useState<ChoiceView | null>(null)
@@ -149,7 +151,11 @@ export default function PilihanPage() {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Pilihan Jawaban</h1>
-                <Button onClick={() => setOpenAdd(true)}>
+                <Button
+                    onClick={() => setOpenAdd(true)}
+                    disabled={!isAdministrator}
+                    title={!isAdministrator ? "Hanya administrator yang dapat menambah pilihan" : undefined}
+                >
                     + Tambah Pilihan
                 </Button>
             </div>
@@ -310,7 +316,10 @@ export default function PilihanPage() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => setSelected(row)}>
+                                            <DropdownMenuItem
+                                                disabled={!isAdministrator}
+                                                onClick={() => setSelected(row)}
+                                            >
                                                 Edit
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

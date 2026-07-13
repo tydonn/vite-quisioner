@@ -10,6 +10,10 @@ type User = {
 type AuthContextType = {
     user: User | null
     loading: boolean
+    roles: string[]
+    programCode: string
+    programName: string
+    isAdministrator: boolean
     fetchUser: () => Promise<boolean>
     setAuthenticatedUser: (user: User | null) => void
     logout: () => void
@@ -79,6 +83,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("auth_program_name", String(programNameCandidate || ""))
     }
 
+    const getAuthRoles = (): string[] => {
+        const rolesRaw = localStorage.getItem("auth_roles")
+        if (!rolesRaw) return []
+
+        try {
+            const parsed = JSON.parse(rolesRaw) as unknown
+            return normalizeRoles(parsed)
+        } catch {
+            return normalizeRoles(rolesRaw)
+        }
+    }
+
     const fetchUser = async (): Promise<boolean> => {
         try {
             const res = await api.get("/me")
@@ -137,9 +153,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, [])
 
+    const roles = getAuthRoles()
+    const programCode = localStorage.getItem("auth_program_code") ?? ""
+    const programName = localStorage.getItem("auth_program_name") ?? ""
+    const isAdministrator = roles.some(
+        (role) => role.toLowerCase() === "administrator"
+    )
+
     return (
         <AuthContext.Provider
-            value={{ user, loading, fetchUser, setAuthenticatedUser, logout }}
+            value={{
+                user,
+                loading,
+                roles,
+                programCode,
+                programName,
+                isAdministrator,
+                fetchUser,
+                setAuthenticatedUser,
+                logout,
+            }}
         >
             {children}
         </AuthContext.Provider>
