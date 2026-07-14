@@ -31,8 +31,11 @@ type PercentageItem = {
     prodi?: { ProdiID?: string | number; Nama?: string }
     dosen?: { Login?: string | number; Nama?: string }
     matakuliah?: { MKID?: string | number; Nama?: string }
+    countofchoicevalue?: Record<string, number>
+    studentcountofchoicevalue?: Record<string, number>
     precentageofchoicevalue?: Record<string, number>
     percentageofchoicevalue?: Record<string, number>
+    total_respondent?: number
 }
 
 function parseRoles(raw: string | null): string[] {
@@ -55,6 +58,24 @@ function normalizeTahunAkademikOption(item: unknown): TahunAkademikOption | null
     const raw = (item as Record<string, unknown>).TahunID
     if (!raw) return null
     return { tahunId: String(raw) }
+}
+
+function getChoicePercentage(row: PercentageItem, value: string) {
+    return row.precentageofchoicevalue?.[value] ?? row.percentageofchoicevalue?.[value] ?? 0
+}
+
+function renderChoiceValueSummary(row: PercentageItem, value: string) {
+    return (
+        <div className="space-y-1">
+            <div className="font-medium">{getChoicePercentage(row, value)}%</div>
+            <div className="text-xs text-muted-foreground">
+                Jawaban: {row.countofchoicevalue?.[value] ?? 0}
+            </div>
+            <div className="text-xs text-muted-foreground">
+                Mahasiswa: {row.studentcountofchoicevalue?.[value] ?? 0}
+            </div>
+        </div>
+    )
 }
 
 export default function HasilAnalisisPersentasePage() {
@@ -237,28 +258,28 @@ export default function HasilAnalisisPersentasePage() {
                             {data.map((row, idx) => (
                                 <TableRow key={`${row.dosen?.Login ?? "dosen"}-${row.matakuliah?.MKID ?? "mk"}-${idx}`}>
                                     <TableCell>{row.TahunAkademik ?? "-"}</TableCell>
-                                    <TableCell>
+                                    <TableCell className="max-w-40 whitespace-normal py-3">
                                         <div>{row.prodi?.ProdiID ? String(row.prodi.ProdiID) : "-"}</div>
-                                        <div className="text-xs text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground break-words">
                                             {row.prodi?.Nama ?? "-"}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="max-w-40 whitespace-normal py-3">
                                         <div>{row.dosen?.Login ? String(row.dosen.Login) : "-"}</div>
-                                        <div className="text-xs text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground break-words">
                                             {row.dosen?.Nama ?? "-"}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="max-w-40 whitespace-normal py-3">
                                         <div>{row.matakuliah?.MKID ? String(row.matakuliah.MKID) : "-"}</div>
-                                        <div className="text-xs text-muted-foreground max-w-xs truncate">
+                                        <div className="text-xs text-muted-foreground break-words">
                                             {row.matakuliah?.Nama ?? "-"}
                                         </div>
                                     </TableCell>
-                                    <TableCell>{row.precentageofchoicevalue?.["1"] ?? row.percentageofchoicevalue?.["1"] ?? 0}</TableCell>
-                                    <TableCell>{row.precentageofchoicevalue?.["2"] ?? row.percentageofchoicevalue?.["2"] ?? 0}</TableCell>
-                                    <TableCell>{row.precentageofchoicevalue?.["3"] ?? row.percentageofchoicevalue?.["3"] ?? 0}</TableCell>
-                                    <TableCell>{row.precentageofchoicevalue?.["4"] ?? row.percentageofchoicevalue?.["4"] ?? 0}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "1")}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "2")}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "3")}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "4")}</TableCell>
                                 </TableRow>
                             ))}
                             {data.length === 0 && (
