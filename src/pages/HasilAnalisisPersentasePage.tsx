@@ -68,9 +68,9 @@ function renderChoiceValueSummary(row: PercentageItem, value: string) {
     return (
         <div className="space-y-1">
             <div className="font-medium">{getChoicePercentage(row, value)}%</div>
-            <div className="text-xs text-muted-foreground">
+            {/* <div className="text-xs text-muted-foreground">
                 Jawaban: {row.countofchoicevalue?.[value] ?? 0}
-            </div>
+            </div> */}
             <div className="text-xs text-muted-foreground">
                 Mahasiswa: {row.studentcountofchoicevalue?.[value] ?? 0}
             </div>
