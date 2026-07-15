@@ -239,7 +239,7 @@ export function AppSidebar() {
                 </SidebarGroup>
 
                 {/* ===== OUTPUT ===== */}
-                <SidebarGroup>
+                {/* <SidebarGroup>
                     <SidebarGroupLabel>Output</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
@@ -270,7 +270,7 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
-                </SidebarGroup>
+                </SidebarGroup> */}
             </SidebarContent>
 
             {/* ================= FOOTER ================= */}

@@ -319,7 +319,7 @@ export default function BankPertanyaanPage() {
                             <TableHead>Responden</TableHead>
                             <TableHead>Urutan</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Prodi</TableHead>
+                            {/* <TableHead>Prodi</TableHead> */}
                             <TableHead>Aktivitas</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>
                         </TableRow>
@@ -339,9 +339,9 @@ export default function BankPertanyaanPage() {
                                         {item.status}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="max-w-xs whitespace-normal">
+                                {/* <TableCell className="max-w-xs whitespace-normal">
                                     {item.prodiNama}
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell>
                                     <Button
                                         size="icon"
