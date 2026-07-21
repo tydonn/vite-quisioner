@@ -20,6 +20,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    PercentageDetailDialog,
+    type PercentageDetailDialogState,
+    type PercentageDetailQuestion,
+} from "@/features/response-detail/components/PercentageDetailDialog"
 import type { ResponseFilterProdiOption } from "@/features/response/types"
 import api from "@/lib/api"
 
@@ -36,6 +41,21 @@ type PercentageItem = {
     precentageofchoicevalue?: Record<string, number>
     percentageofchoicevalue?: Record<string, number>
     total_respondent?: number
+}
+
+type PercentageDetailResponseItem = {
+    TahunAkademik?: string | number
+    prodi?: { ProdiID?: string | number; Nama?: string }
+    dosen?: { Login?: string | number; Nama?: string }
+    matakuliah?: { MKID?: string | number; Nama?: string }
+    precentageofchoicevalue?: Record<
+        string,
+        {
+            count?: number
+            percentage?: number
+            questions?: PercentageDetailQuestion[]
+        }
+    >
 }
 
 function parseRoles(raw: string | null): string[] {
@@ -64,9 +84,13 @@ function getChoicePercentage(row: PercentageItem, value: string) {
     return row.precentageofchoicevalue?.[value] ?? row.percentageofchoicevalue?.[value] ?? 0
 }
 
-function renderChoiceValueSummary(row: PercentageItem, value: string) {
+function renderChoiceValueSummary(row: PercentageItem, value: string, onDetailClick: () => void) {
     return (
-        <div className="space-y-1">
+        <button
+            type="button"
+            onClick={onDetailClick}
+            className="w-full rounded-md p-2 text-left transition-colors hover:bg-muted"
+        >
             <div className="font-medium">{getChoicePercentage(row, value)}%</div>
             {/* <div className="text-xs text-muted-foreground">
                 Jawaban: {row.countofchoicevalue?.[value] ?? 0}
@@ -74,7 +98,10 @@ function renderChoiceValueSummary(row: PercentageItem, value: string) {
             <div className="text-xs text-muted-foreground">
                 Mahasiswa: {row.studentcountofchoicevalue?.[value] ?? 0}
             </div>
-        </div>
+            <div className="text-xs text-primary">
+                Lihat detail
+            </div>
+        </button>
     )
 }
 
@@ -100,6 +127,13 @@ export default function HasilAnalisisPersentasePage() {
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(10)
     const [errorMessage, setErrorMessage] = useState("")
+    const [detailDialog, setDetailDialog] = useState<PercentageDetailDialogState>({
+        open: false,
+        loading: false,
+        title: "",
+        questions: [],
+        error: "",
+    })
 
     useEffect(() => {
         api.get<{ data?: unknown[] }>("/tahun-akademik/options").then((res) => {
@@ -164,6 +198,60 @@ export default function HasilAnalisisPersentasePage() {
     const total = allData.length
     const lastPage = Math.max(1, Math.ceil(total / perPage))
     const data = useMemo(() => allData.slice((page - 1) * perPage, page * perPage), [allData, page, perPage])
+
+    async function openDetailDialog(row: PercentageItem, choiceValue: string) {
+        const tahunAkademik = row.TahunAkademik ?? tahunAkademikFilter
+        const prodiId = row.prodi?.ProdiID ?? (isAdministrator ? prodiFilter : storedProgramCode)
+        const dosenId = row.dosen?.Login
+        const matakuliahId = row.matakuliah?.MKID
+        const choiceLabels: Record<string, string> = {
+            "1": "Tidak Puas",
+            "2": "Kurang Puas",
+            "3": "Puas",
+            "4": "Sangat Puas",
+        }
+
+        setDetailDialog({
+            open: true,
+            loading: true,
+            title: `${choiceLabels[choiceValue] ?? `Value ${choiceValue}`} - ${row.dosen?.Nama ?? "-"} - ${row.matakuliah?.Nama ?? "-"}`,
+            questions: [],
+            error: "",
+        })
+
+        try {
+            const res = await api.get<{ data?: PercentageDetailResponseItem[] }>(
+                "/response-details/percentage-result/detail",
+                {
+                    params: {
+                        tahun_akademik: tahunAkademik || undefined,
+                        prodi_id: prodiId || undefined,
+                        dosen_id: dosenId || undefined,
+                        choice_value: choiceValue,
+                        matakuliah_id: matakuliahId || undefined,
+                    },
+                }
+            )
+
+            const firstItem = Array.isArray(res.data.data) ? res.data.data[0] : undefined
+            const detail = firstItem?.precentageofchoicevalue?.[choiceValue]
+
+            setDetailDialog((prev) => ({
+                ...prev,
+                loading: false,
+                questions: detail?.questions ?? [],
+                error: detail?.questions?.length ? "" : "Tidak ada detail pertanyaan untuk value ini.",
+            }))
+        } catch (error) {
+            console.error("Gagal mengambil detail persentase", error)
+            setDetailDialog((prev) => ({
+                ...prev,
+                loading: false,
+                questions: [],
+                error: "Gagal mengambil detail pertanyaan.",
+            }))
+        }
+    }
 
     return (
         <div className="space-y-4">
@@ -276,10 +364,10 @@ export default function HasilAnalisisPersentasePage() {
                                             {row.matakuliah?.Nama ?? "-"}
                                         </div>
                                     </TableCell>
-                                    <TableCell>{renderChoiceValueSummary(row, "1")}</TableCell>
-                                    <TableCell>{renderChoiceValueSummary(row, "2")}</TableCell>
-                                    <TableCell>{renderChoiceValueSummary(row, "3")}</TableCell>
-                                    <TableCell>{renderChoiceValueSummary(row, "4")}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "1", () => openDetailDialog(row, "1"))}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "2", () => openDetailDialog(row, "2"))}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "3", () => openDetailDialog(row, "3"))}</TableCell>
+                                    <TableCell>{renderChoiceValueSummary(row, "4", () => openDetailDialog(row, "4"))}</TableCell>
                                 </TableRow>
                             ))}
                             {data.length === 0 && (
@@ -330,6 +418,16 @@ export default function HasilAnalisisPersentasePage() {
                     <Button size="sm" variant="outline" onClick={() => setPage((prev) => Math.min(lastPage, prev + 1))} disabled={page >= lastPage}>Berikutnya</Button>
                 </div>
             </div>
+
+            <PercentageDetailDialog
+                state={detailDialog}
+                onOpenChange={(open) =>
+                    setDetailDialog((prev) => ({
+                        ...prev,
+                        open,
+                    }))
+                }
+            />
         </div>
     )
 }
