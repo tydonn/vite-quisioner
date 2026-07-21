@@ -98,9 +98,9 @@ function renderChoiceValueSummary(row: PercentageItem, value: string, onDetailCl
             <div className="text-xs text-muted-foreground">
                 Mahasiswa: {row.studentcountofchoicevalue?.[value] ?? 0}
             </div>
-            <div className="text-xs text-primary">
+            {/* <div className="text-xs text-primary">
                 Lihat detail
-            </div>
+            </div> */}
         </button>
     )
 }

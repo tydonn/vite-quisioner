@@ -42,7 +42,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
         aspectText: "",
         answerType: "CHOICE" as "CHOICE" | "TEXT" | "LIKERT",
         sortOrder: 1,
-        isActive: true,
+        isActive: false,
     })
 
     useEffect(() => {
@@ -102,7 +102,7 @@ export function AddPertanyaanDialog({ open, onClose, onSuccess }: Props) {
                 aspectText: "",
                 answerType: "CHOICE",
                 sortOrder: 1,
-                isActive: true,
+                isActive: false,
             })
         } catch (error) {
             console.error("Gagal menambah pertanyaan", error)
