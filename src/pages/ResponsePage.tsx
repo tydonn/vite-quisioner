@@ -99,6 +99,8 @@ export default function ResponsePage() {
     const [tahunAkademikOptions, setTahunAkademikOptions] = useState<TahunAkademikOption[]>([])
     const [isProdiOpen, setIsProdiOpen] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
+    const [downloadMessage, setDownloadMessage] = useState("")
+    const [downloadStatus, setDownloadStatus] = useState<"idle" | "success" | "error">("idle")
     const [isFiltering, setIsFiltering] = useState(false)
     const [isProdiLoading, setIsProdiLoading] = useState(false)
     const [isPaging, setIsPaging] = useState(false)
@@ -210,9 +212,7 @@ export default function ResponsePage() {
         ? `${selectedProdi.id} - ${selectedProdi.nama}`
         : "All Prodi"
 
-    const isFilterReady = Boolean(
-        isAdministrator ? prodiInput && tahunAkademikInput : tahunAkademikInput
-    )
+    const isFilterReady = Boolean(tahunAkademikInput)
     const hasActiveFilter = Boolean(
         prodiInput ||
         prodiQuery ||
@@ -381,6 +381,8 @@ export default function ResponsePage() {
                             if (!ok) return
 
                             setIsDownloading(true)
+                            setDownloadStatus("idle")
+                            setDownloadMessage("Sedang menyiapkan file download...")
                             try {
                                 const prodiId = isAdministrator
                                     ? selectedProdi?.id
@@ -422,6 +424,8 @@ export default function ResponsePage() {
                                 link.download = `${baseName || "response-detail"}_${timestamp}.xlsx`
                                 link.click()
                                 URL.revokeObjectURL(url)
+                                setDownloadStatus("success")
+                                setDownloadMessage(`Download berhasil disiapkan: ${link.download}`)
                             } catch (err) {
                                 const error = err as {
                                     response?: { status?: number; data?: unknown }
@@ -429,6 +433,8 @@ export default function ResponsePage() {
                                 console.error("Gagal export response detail", err)
                                 console.error("Status", error.response?.status)
                                 console.error("Response data", error.response?.data)
+                                setDownloadStatus("error")
+                                setDownloadMessage("Download gagal. Silakan cek koneksi atau response backend.")
                             } finally {
                                 setIsDownloading(false)
                             }
@@ -446,6 +452,19 @@ export default function ResponsePage() {
                 </div>
 
             </div>
+            {downloadMessage ? (
+                <div
+                    className={`rounded-md border px-3 py-2 text-sm ${
+                        downloadStatus === "success"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            : downloadStatus === "error"
+                                ? "border-rose-200 bg-rose-50 text-rose-700"
+                                : "border-muted bg-muted/40 text-muted-foreground"
+                    }`}
+                >
+                    {downloadMessage}
+                </div>
+            ) : null}
 
             <div className="border rounded-lg shadow-sm">
                 {!hasAppliedFilter ? (

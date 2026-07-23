@@ -109,7 +109,6 @@ export default function PilihanPage() {
                 const res = await api.get<{ data: Aspect[] }>("/questions", {
                     params: {
                         per_page: 500,
-                        active: 1,
                     },
                 })
                 setQuestions(res.data.data ?? [])

@@ -56,7 +56,6 @@ export function AddChoiceDialog({ open, onClose, onSuccess }: Props) {
                 const res = await api.get<{ data: Aspect[] }>("/questions", {
                     params: {
                         per_page: 500,
-                        active: 1,
                     },
                 })
                 const rows = res.data.data ?? []
